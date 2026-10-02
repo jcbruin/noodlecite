@@ -1,0 +1,3536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NoodleCite — Chicago Style Citation & Bibliography Suite</title>
+  <style>
+    :root {
+      --primary: #8b0000;
+      --primary-hover: #700000;
+      --primary-light: #fdf2f2;
+      --primary-border: #f8b4b4;
+      --secondary: #1e3a8a;
+      --secondary-light: #eff6ff;
+      --accent: #b45309;
+      --text-main: #1f2937;
+      --text-muted: #4b5563;
+      --text-subtle: #6b7280;
+      --bg-page: #f8fafc;
+      --bg-surface: #ffffff;
+      --border-color: #e2e8f0;
+      --border-focus: #8b0000;
+      --success: #059669;
+      --warning: #d97706;
+      --info: #2563eb;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-bib: "Times New Roman", Times, Georgia, serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-ui);
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Navigation */
+    header.app-header {
+      background: #0f172a;
+      color: #ffffff;
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 3px solid var(--primary);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #991b1b, #7f1d1d);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.25rem;
+      color: #fff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .brand-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      letter-spacing: -0.01em;
+    }
+
+    .brand-tag {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: rgba(255,255,255,0.12);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+      color: #e2e8f0;
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    /* Project Switcher Bar */
+    .project-bar {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border-color);
+      padding: 0.65rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .project-meta {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .project-selector-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .project-selector-wrapper label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    select.project-select {
+      font-family: inherit;
+      font-size: 0.925rem;
+      font-weight: 600;
+      color: var(--text-main);
+      padding: 0.35rem 0.75rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      background-color: #fff;
+      cursor: pointer;
+      outline: none;
+    }
+    select.project-select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(139, 0, 0, 0.15);
+    }
+
+    .style-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: var(--primary-light);
+      color: var(--primary);
+      border: 1px solid var(--primary-border);
+      padding: 0.25rem 0.65rem;
+      border-radius: 9999px;
+    }
+
+    .style-mode-toggle {
+      display: inline-flex;
+      background: #f1f5f9;
+      border-radius: 6px;
+      padding: 2px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .style-mode-toggle button {
+      border: none;
+      background: transparent;
+      padding: 0.3rem 0.7rem;
+      font-size: 0.775rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .style-mode-toggle button.active {
+      background: #ffffff;
+      color: var(--primary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Main Container */
+    main.app-main {
+      flex: 1;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.25rem 1.5rem 3.5rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* Project Overview / Details Card */
+    .project-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.15rem 1.35rem;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .project-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .project-title-area h1 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .project-thesis-box {
+      font-size: 0.9rem;
+      color: var(--text-main);
+      background: #f8fafc;
+      border-left: 4px solid var(--primary);
+      padding: 0.6rem 0.95rem;
+      border-radius: 0 6px 6px 0;
+      line-height: 1.5;
+    }
+
+    .project-stats-row {
+      display: flex;
+      align-items: center;
+      gap: 1.75rem;
+      padding-top: 0.6rem;
+      border-top: 1px dashed var(--border-color);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      flex-wrap: wrap;
+    }
+
+    .stat-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+    .stat-count {
+      font-weight: 700;
+      color: #0f172a;
+      background: #f1f5f9;
+      padding: 1px 7px;
+      border-radius: 4px;
+    }
+
+    /* Navigation Tabs */
+    .tab-navigation {
+      display: flex;
+      border-bottom: 2px solid #e2e8f0;
+      gap: 0.5rem;
+      margin-top: 0.25rem;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      font-family: inherit;
+      font-size: 0.925rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      padding: 0.65rem 1.15rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      color: var(--primary);
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .tab-badge {
+      background: #e2e8f0;
+      color: #334155;
+      font-size: 0.725rem;
+      padding: 2px 7px;
+      border-radius: 10px;
+    }
+    .tab-btn.active .tab-badge {
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+
+    /* Tab Content Areas */
+    .tab-content {
+      display: none;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+    .tab-content.active {
+      display: flex;
+    }
+
+    /* Control Toolbar */
+    .controls-toolbar {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .search-filter-group {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      flex: 1;
+      min-width: 300px;
+      flex-wrap: wrap;
+    }
+
+    .search-input-wrapper {
+      position: relative;
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .search-input-wrapper input {
+      width: 100%;
+      padding: 0.45rem 0.75rem 0.45rem 2rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      outline: none;
+    }
+    .search-input-wrapper input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(139,0,0,0.1);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 0.65rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+      pointer-events: none;
+      width: 15px;
+      height: 15px;
+    }
+
+    .filter-select, .sort-select {
+      padding: 0.45rem 0.65rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      background: #fff;
+      color: var(--text-main);
+      outline: none;
+    }
+
+    .action-button-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      font-family: inherit;
+      font-size: 0.875rem;
+      font-weight: 600;
+      padding: 0.45rem 0.9rem;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: #ffffff;
+    }
+    .btn-primary:hover {
+      background-color: var(--primary-hover);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-secondary {
+      background-color: #ffffff;
+      color: var(--text-main);
+      border-color: #cbd5e1;
+    }
+    .btn-secondary:hover {
+      background-color: #f1f5f9;
+      border-color: #94a3b8;
+    }
+
+    .btn-outline-primary {
+      background-color: transparent;
+      color: var(--primary);
+      border-color: var(--primary-border);
+    }
+    .btn-outline-primary:hover {
+      background-color: var(--primary-light);
+    }
+
+    .btn-sm {
+      padding: 0.3rem 0.65rem;
+      font-size: 0.8rem;
+    }
+
+    .btn-icon {
+      padding: 0.4rem;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      background: #fff;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-icon:hover {
+      background: #f8fafc;
+      color: var(--text-main);
+    }
+
+    /* Source List Card Items */
+    .sources-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+    }
+
+    .source-item {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.1rem 1.35rem;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .source-item:hover {
+      border-color: #94a3b8;
+      box-shadow: var(--shadow-md);
+    }
+
+    .source-header-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .source-type-pill {
+      font-size: 0.725rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 3px 9px;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .type-book { background: #fef3c7; color: #92400e; }
+    .type-journal { background: #dbeafe; color: #1e40af; }
+    .type-website { background: #e0e7ff; color: #3730a3; }
+    .type-newspaper { background: #fce7f3; color: #9d174d; }
+    .type-chapter { background: #ede9fe; color: #5b21b6; }
+    .type-multimedia { background: #ffedd5; color: #9a3412; }
+    .type-interview { background: #dcfce7; color: #166534; }
+
+    .source-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    /* Citation Formatted Display */
+    .citation-box {
+      background: #ffffff;
+      border: 1px solid #f1f5f9;
+      border-radius: 6px;
+      padding: 0.85rem 1.15rem;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
+    }
+
+    .chicago-formatted-entry {
+      font-family: var(--font-bib);
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: #000;
+      text-indent: -36px;
+      padding-left: 36px;
+      word-break: break-word;
+    }
+
+    .chicago-formatted-entry i, .chicago-formatted-entry em {
+      font-style: italic;
+    }
+
+    /* Footnote & In-text snippet bar */
+    .citation-snippets-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      background: #f8fafc;
+      border-top: 1px dashed var(--border-color);
+      padding-top: 0.6rem;
+      font-size: 0.825rem;
+    }
+
+    .snippet-tag {
+      font-weight: 700;
+      color: var(--text-subtle);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .snippet-preview {
+      font-family: var(--font-bib);
+      font-size: 0.925rem;
+      color: #1e293b;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      padding: 3px 9px;
+      border-radius: 4px;
+      flex: 1;
+      min-width: 140px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Annotation block */
+    .source-annotation {
+      background: #fffbeb;
+      border-left: 4px solid #f59e0b;
+      padding: 0.6rem 0.95rem;
+      font-size: 0.875rem;
+      border-radius: 0 6px 6px 0;
+      color: #78350f;
+      line-height: 1.5;
+    }
+    .source-annotation strong {
+      display: block;
+      margin-bottom: 2px;
+      font-size: 0.775rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #92400e;
+    }
+
+    /* Notecards View */
+    .notecards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 1.15rem;
+    }
+
+    .notecard-item {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.15rem;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      position: relative;
+      transition: all 0.15s ease;
+    }
+
+    .notecard-item:hover {
+      box-shadow: var(--shadow-md);
+      border-color: #cbd5e1;
+    }
+
+    .notecard-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .notecard-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .notecard-source-ref {
+      font-size: 0.8rem;
+      color: var(--primary);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      margin-top: 2px;
+    }
+
+    .notecard-section {
+      font-size: 0.85rem;
+      border-radius: 5px;
+      padding: 0.5rem 0.75rem;
+      line-height: 1.5;
+    }
+    .section-quote {
+      background: #f8fafc;
+      border-left: 3px solid #64748b;
+      font-style: italic;
+      color: #334155;
+    }
+    .section-paraphrase {
+      background: #eff6ff;
+      border-left: 3px solid #3b82f6;
+      color: #1e3a8a;
+    }
+    .section-thoughts {
+      background: #ecfdf5;
+      border-left: 3px solid #10b981;
+      color: #064e3b;
+    }
+    .notecard-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 2px;
+      display: block;
+      color: var(--text-muted);
+      font-style: normal;
+    }
+
+    /* Print / Bibliography Preview Canvas */
+    .bib-paper-preview {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      box-shadow: var(--shadow-md);
+      padding: 3.5rem 4rem;
+      max-width: 900px;
+      margin: 0 auto;
+      min-height: 850px;
+      font-family: var(--font-bib);
+      color: #000;
+      line-height: 2.0; /* Chicago double space */
+    }
+
+    .bib-paper-title {
+      text-align: center;
+      font-size: 1.35rem;
+      font-weight: bold;
+      margin-bottom: 2rem;
+      text-transform: capitalize;
+    }
+
+    .bib-paper-entry {
+      text-indent: -36px;
+      padding-left: 36px;
+      margin-bottom: 1.25rem;
+      font-size: 1.1rem;
+      word-break: break-word;
+    }
+
+    .bib-paper-entry i, .bib-paper-entry em {
+      font-style: italic;
+    }
+
+    .bib-paper-annotation {
+      text-indent: 0;
+      padding-left: 36px;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: #262626;
+      margin-top: -0.65rem;
+      margin-bottom: 1.25rem;
+    }
+
+    /* Modals */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(2px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 1rem;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-card {
+      background: #ffffff;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 860px;
+      max-height: 92vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      animation: modalSlide 0.2s ease-out;
+    }
+
+    @keyframes modalSlide {
+      from { transform: translateY(15px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .modal-header {
+      background: #0f172a;
+      color: #fff;
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-header h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .modal-close-btn {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      font-size: 1.35rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+    }
+    .modal-close-btn:hover {
+      color: #fff;
+      background: rgba(255,255,255,0.1);
+    }
+
+    .modal-body {
+      padding: 1.35rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .modal-footer {
+      background: #f8fafc;
+      border-top: 1px solid var(--border-color);
+      padding: 0.9rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.75rem;
+    }
+
+    /* Live Preview Banner in Wizard */
+    .live-preview-box {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .live-preview-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--primary);
+    }
+
+    .live-preview-content {
+      font-family: var(--font-bib);
+      font-size: 1.05rem;
+      line-height: 1.6;
+      color: #000;
+      text-indent: -28px;
+      padding-left: 28px;
+      background: #fff;
+      padding: 0.75rem 1rem 0.75rem 2.5rem;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+      min-height: 48px;
+    }
+
+    .live-notes-preview {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      font-size: 0.85rem;
+    }
+
+    .note-preview-cell {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 0.5rem 0.75rem;
+    }
+    .note-preview-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+    .note-preview-text {
+      font-family: var(--font-bib);
+      font-size: 0.95rem;
+      color: #111827;
+      word-break: break-word;
+    }
+
+    /* Source Type Selector Grid */
+    .source-type-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 0.65rem;
+    }
+
+    .type-select-btn {
+      border: 1px solid #cbd5e1;
+      background: #fff;
+      border-radius: 8px;
+      padding: 0.75rem 0.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-main);
+      transition: all 0.15s ease;
+    }
+
+    .type-select-btn:hover {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    .type-select-btn.active {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(139,0,0,0.15);
+    }
+
+    .type-icon {
+      font-size: 1.5rem;
+    }
+
+    /* Form Layouts */
+    .form-section {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .form-section-title {
+      font-size: 0.825rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.35rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .form-group label {
+      font-size: 0.825rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .form-group input, .form-group select, .form-group textarea {
+      padding: 0.45rem 0.65rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 0.875rem;
+      outline: none;
+    }
+
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(139,0,0,0.1);
+    }
+
+    .field-hint {
+      font-size: 0.725rem;
+      color: var(--text-subtle);
+    }
+
+    /* Contributors / Authors Builder */
+    .contributors-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .contributor-row {
+      display: grid;
+      grid-template-columns: 110px 1fr 1fr 1fr 34px;
+      gap: 0.4rem;
+      align-items: center;
+    }
+
+    .remove-btn {
+      color: #ef4444;
+      background: transparent;
+      border: 1px solid #fecaca;
+      border-radius: 6px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .remove-btn:hover {
+      background: #fee2e2;
+    }
+
+    /* Quick Footnote Assistant Tool Modal */
+    .footnote-builder-result {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .footnote-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 0.75rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .footnote-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footnote-text {
+      font-family: var(--font-bib);
+      font-size: 1rem;
+      line-height: 1.5;
+      color: #111827;
+    }
+
+    /* Toast Notification */
+    .toast-container {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      z-index: 2000;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: #0f172a;
+      color: #ffffff;
+      padding: 0.7rem 1.25rem;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      animation: toastIn 0.25s ease-out;
+      pointer-events: auto;
+      border-left: 4px solid #10b981;
+    }
+
+    @keyframes toastIn {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* Print Styles */
+    @media print {
+      header.app-header, .project-bar, .tab-navigation, .controls-toolbar, .source-actions, .modal-overlay, .toast-container, .citation-snippets-bar {
+        display: none !important;
+      }
+      body, main.app-main {
+        background: #fff !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      .bib-paper-preview {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 3.5rem 1.5rem;
+      background: #fff;
+      border: 2px dashed #cbd5e1;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .empty-state-icon {
+      font-size: 2.75rem;
+      color: #94a3b8;
+    }
+
+    .empty-state-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #334155;
+    }
+
+    .empty-state-desc {
+      font-size: 0.875rem;
+      color: #64748b;
+      max-width: 440px;
+    }
+
+    /* Guide & Documentation */
+    .guide-card {
+      background: #fff;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.35rem;
+      box-shadow: var(--shadow-sm);
+    }
+    .guide-card h3 {
+      font-size: 1.15rem;
+      color: var(--primary);
+      margin-bottom: 0.65rem;
+    }
+    .guide-card p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+    }
+    .guide-example {
+      background: #f8fafc;
+      border-left: 3px solid var(--primary);
+      padding: 0.75rem 1rem;
+      font-family: var(--font-bib);
+      font-size: 0.95rem;
+      margin-bottom: 0.75rem;
+      line-height: 1.6;
+    }
+
+    /* Raw Quick Cite Box in Wizard */
+    .quick-cite-box {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 6px;
+      padding: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .quick-cite-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.775rem;
+      font-weight: 700;
+      color: var(--secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top App Navigation -->
+  <header class="app-header">
+    <div class="brand-section">
+      <div class="brand-logo">N</div>
+      <div class="brand-title">
+        NoodleCite
+        <span class="brand-tag">Chicago 17th / 18th Ed.</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-secondary btn-sm" id="btnFootnoteTool">
+        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+        Footnote / In-Text Tool
+      </button>
+      <button class="btn btn-secondary btn-sm" id="btnQuickSample">
+        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+        Load Sample Project
+      </button>
+      <button class="btn btn-primary btn-sm" id="btnNewSourceTop">
+        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+        + New Source
+      </button>
+    </div>
+  </header>
+
+  <!-- Project Switcher & Style System Bar -->
+  <div class="project-bar">
+    <div class="project-meta">
+      <div class="project-selector-wrapper">
+        <label for="projectSelect">Project:</label>
+        <select id="projectSelect" class="project-select"></select>
+        <button class="btn btn-secondary btn-sm" id="btnNewProject" title="Create a new research project">+ Project</button>
+      </div>
+
+      <div class="style-pill">
+        <span>Chicago Style</span>
+      </div>
+
+      <div class="style-mode-toggle">
+        <button id="btnModeNB" class="active" title="Chicago Notes & Bibliography: standard for humanities, history, and literature">Notes &amp; Bibliography</button>
+        <button id="btnModeAD" title="Chicago Author-Date: standard for social, natural, and physical sciences">Author-Date</button>
+      </div>
+    </div>
+
+    <div class="action-button-group">
+      <button class="btn btn-secondary btn-sm" id="btnProjectSettings">
+        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+        Edit Thesis / Details
+      </button>
+      <button class="btn btn-secondary btn-sm" id="btnExportBib">
+        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+        Export Options
+      </button>
+      <button class="btn btn-secondary btn-sm" id="btnPrintBib">
+        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+        Print
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Work Area -->
+  <main class="app-main">
+    
+    <!-- Active Project Banner Card -->
+    <div class="project-card">
+      <div class="project-header-row">
+        <div class="project-title-area">
+          <h1 id="displayProjectTitle">Loading Project...</h1>
+        </div>
+      </div>
+      <div class="project-thesis-box" id="displayProjectThesis">
+        <em>No research question or thesis statement defined. Click "Edit Thesis / Details" to set one.</em>
+      </div>
+      <div class="project-stats-row">
+        <div class="stat-badge">
+          <span>Sources:</span>
+          <span class="stat-count" id="statSourceCount">0</span>
+        </div>
+        <div class="stat-badge">
+          <span>Books:</span>
+          <span class="stat-count" id="statBookCount">0</span>
+        </div>
+        <div class="stat-badge">
+          <span>Articles &amp; Periodicals:</span>
+          <span class="stat-count" id="statArticleCount">0</span>
+        </div>
+        <div class="stat-badge">
+          <span>Web &amp; Digital:</span>
+          <span class="stat-count" id="statWebCount">0</span>
+        </div>
+        <div class="stat-badge">
+          <span>Research Notecards:</span>
+          <span class="stat-count" id="statNoteCount">0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="tab-navigation">
+      <button class="tab-btn active" data-tab="tabSources">
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+        Sources / Citations
+        <span class="tab-badge" id="badgeSourcesCount">0</span>
+      </button>
+      <button class="tab-btn" data-tab="tabNotecards">
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+        Notecards &amp; Evidence
+        <span class="tab-badge" id="badgeNotecardsCount">0</span>
+      </button>
+      <button class="tab-btn" data-tab="tabPaperPreview">
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+        Bibliography Page View
+      </button>
+      <button class="tab-btn" data-tab="tabGuide">
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        Chicago Quick Guide
+      </button>
+    </div>
+
+    <!-- TAB 1: Sources & Citations -->
+    <div id="tabSources" class="tab-content active">
+      <div class="controls-toolbar">
+        <div class="search-filter-group">
+          <div class="search-input-wrapper">
+            <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            <input type="text" id="searchInput" placeholder="Search by author, title, keyword...">
+          </div>
+          <select id="filterType" class="filter-select">
+            <option value="all">All Types</option>
+            <option value="book">Books</option>
+            <option value="journal">Journals</option>
+            <option value="website">Websites</option>
+            <option value="newspaper">Newspapers/Magazines</option>
+            <option value="chapter">Book Chapters</option>
+            <option value="multimedia">Film / Audio</option>
+          </select>
+          <select id="sortOrder" class="sort-select">
+            <option value="author-az">Sort: Author (A–Z Chicago)</option>
+            <option value="year-desc">Sort: Publication Year (Newest)</option>
+            <option value="year-asc">Sort: Publication Year (Oldest)</option>
+            <option value="recent">Sort: Recently Added</option>
+          </select>
+        </div>
+        <div class="action-button-group">
+          <label style="display:flex; align-items:center; gap:0.35rem; font-size:0.825rem; font-weight:600; cursor:pointer;">
+            <input type="checkbox" id="chkToggleAnnotations" checked>
+            Show Annotations
+          </label>
+          <button class="btn btn-primary" id="btnNewSource">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            + New Source
+          </button>
+        </div>
+      </div>
+
+      <div class="sources-container" id="sourcesList">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+    <!-- TAB 2: Notecards -->
+    <div id="tabNotecards" class="tab-content">
+      <div class="controls-toolbar">
+        <div style="font-size:0.9rem; font-weight:600; color:var(--text-muted);">
+          Capture direct quotations, paraphrases, and your own analysis linked to your sources.
+        </div>
+        <button class="btn btn-primary" id="btnNewNotecard">
+          <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+          + New Notecard
+        </button>
+      </div>
+      <div class="notecards-grid" id="notecardsGrid">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+    <!-- TAB 3: Bibliography Page View (Formatted Paper View) -->
+    <div id="tabPaperPreview" class="tab-content">
+      <div class="controls-toolbar">
+        <div style="font-size:0.875rem; color:var(--text-muted);">
+          Standard academic layout: Times New Roman 12pt, centered heading, 0.5-inch hanging indent, double spaced.
+        </div>
+        <div class="action-button-group">
+          <button class="btn btn-secondary btn-sm" id="btnCopyFormattedBib">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+            Copy Works Cited
+          </button>
+          <button class="btn btn-primary btn-sm" id="btnDownloadDocx">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+            Download Word Document (.doc)
+          </button>
+        </div>
+      </div>
+
+      <div class="bib-paper-preview" id="bibPaperContent">
+        <!-- Live Formatted Chicago Bibliography -->
+      </div>
+    </div>
+
+    <!-- TAB 4: Chicago Style Quick Guide -->
+    <div id="tabGuide" class="tab-content">
+      <div class="guide-card">
+        <h3>Chicago Style Documentation System Overview</h3>
+        <p>The <em>Chicago Manual of Style</em> (17th &amp; 18th Editions) offers two distinct citation tracks:</p>
+        <ul style="margin-left: 1.5rem; margin-bottom: 1rem; font-size: 0.9rem; color: var(--text-muted);">
+          <li><strong>Notes &amp; Bibliography (NB):</strong> Standard in history, literature, theology, art, and the humanities. Uses numbered footnotes or endnotes in text, and an alphabetical Bibliography at the end.</li>
+          <li><strong>Author-Date (AD):</strong> Common in the physical, natural, and social sciences. Uses brief parenthetical text citations (Author Year, Page) and an alphabetical Reference List at the end.</li>
+        </ul>
+
+        <h4 style="margin-top: 1.25rem; margin-bottom: 0.35rem; color:#0f172a;">1. Books</h4>
+        <div class="guide-example">
+          <strong>Bibliography:</strong> Chernow, Ron. <em>Alexander Hamilton</em>. New York: Penguin Books, 2004.<br>
+          <strong>Footnote (Full):</strong> 1. Ron Chernow, <em>Alexander Hamilton</em> (New York: Penguin Books, 2004), 52.<br>
+          <strong>Short Note:</strong> Chernow, <em>Alexander Hamilton</em>, 52.<br>
+          <strong>Author-Date:</strong> (Chernow 2004, 52) / Chernow, Ron. 2004. <em>Alexander Hamilton</em>. New York: Penguin Books.
+        </div>
+
+        <h4 style="margin-top: 1.25rem; margin-bottom: 0.35rem; color:#0f172a;">2. Journal Articles (with DOI)</h4>
+        <div class="guide-example">
+          <strong>Bibliography:</strong> Davis, Natalie Zemon. "The Rites of Violence: Religious Riot in Sixteenth-Century France." <em>Past &amp; Present</em>, no. 59 (1973): 51–91. https://doi.org/10.1093/past/59.1.51.<br>
+          <strong>Footnote (Full):</strong> 1. Natalie Zemon Davis, "The Rites of Violence: Religious Riot in Sixteenth-Century France," <em>Past &amp; Present</em>, no. 59 (1973): 55, https://doi.org/10.1093/past/59.1.51.<br>
+          <strong>Short Note:</strong> Davis, "The Rites of Violence," 55.
+        </div>
+
+        <h4 style="margin-top: 1.25rem; margin-bottom: 0.35rem; color:#0f172a;">3. Chapter in an Edited Collection</h4>
+        <div class="guide-example">
+          <strong>Bibliography:</strong> Morgan, Edmund S. "The Puritan Ethic and the American Revolution." In <em>Essays on the American Revolution</em>, edited by Stephen G. Kurtz and James H. Hutson, 3–43. Chapel Hill: University of North Carolina Press, 1973.<br>
+          <strong>Footnote (Full):</strong> 1. Edmund S. Morgan, "The Puritan Ethic and the American Revolution," in <em>Essays on the American Revolution</em>, ed. Stephen G. Kurtz and James H. Hutson (Chapel Hill: University of North Carolina Press, 1973), 15.<br>
+          <strong>Short Note:</strong> Morgan, "The Puritan Ethic," 15.
+        </div>
+
+        <h4 style="margin-top: 1.25rem; margin-bottom: 0.35rem; color:#0f172a;">4. Websites &amp; Online Documents</h4>
+        <div class="guide-example">
+          <strong>Bibliography:</strong> Library of Congress. "The American Revolution: A Selected Resource Guide." <em>Library of Congress Digital Collections</em>. Accessed October 1, 2026. https://www.loc.gov/rr/program/bib/revwar/.<br>
+          <strong>Footnote (Full):</strong> 1. Library of Congress, "The American Revolution: A Selected Resource Guide," <em>Library of Congress Digital Collections</em>, accessed October 1, 2026, https://www.loc.gov/rr/program/bib/revwar/.
+        </div>
+
+        <h4 style="margin-top: 1.25rem; margin-bottom: 0.35rem; color:#0f172a;">5. Multiple Authors in Chicago</h4>
+        <p style="font-size:0.875rem;">
+          • <strong>Two authors:</strong> Bibliography: <em>Last1, First1, and First2 Last2.</em> | Note: <em>First1 Last1 and First2 Last2.</em><br>
+          • <strong>Three authors:</strong> Bibliography: <em>Last1, First1, First2 Last2, and First3 Last3.</em> | Note: <em>First1 Last1, First2 Last2, and First3 Last3.</em><br>
+          • <strong>Four or more:</strong> In notes, give the first author followed by <em>et al.</em> In bibliography, give the first author followed by <em>et al.</em> (or up to 10 authors listed).
+        </p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- MODAL: Source Creator / Editor Wizard -->
+  <div class="modal-overlay" id="sourceModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="sourceModalTitle">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+          Add Citation Source
+        </h2>
+        <button class="modal-close-btn" id="btnCloseSourceModal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        
+        <!-- Live Preview Banner inside Wizard -->
+        <div class="live-preview-box">
+          <div class="live-preview-header">
+            <span>Live Chicago Citation Preview</span>
+            <span id="previewStyleIndicator">Notes &amp; Bibliography Mode</span>
+          </div>
+          <div class="live-preview-content" id="modalLiveBibPreview">
+            <em>Fill in the fields below to see live formatted citation...</em>
+          </div>
+          <div class="live-notes-preview">
+            <div class="note-preview-cell">
+              <div class="note-preview-label">Full Footnote (First Occurrence)</div>
+              <div class="note-preview-text" id="modalLiveNotePreview">—</div>
+            </div>
+            <div class="note-preview-cell">
+              <div class="note-preview-label">Short Note / Subsequent</div>
+              <div class="note-preview-text" id="modalLiveShortNotePreview">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Template / Raw Citation Assistant -->
+        <div class="quick-cite-box">
+          <div class="quick-cite-header">
+            <span>Quick-Fill Benchmark Examples</span>
+            <span style="font-size:0.7rem; color:var(--text-subtle);">Click an example to pre-populate form</span>
+          </div>
+          <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+            <button class="btn btn-secondary btn-sm" type="button" id="btnPrefillBook">Book: Chernow Hamilton</button>
+            <button class="btn btn-secondary btn-sm" type="button" id="btnPrefillJournal">Journal: Davis Past &amp; Present</button>
+            <button class="btn btn-secondary btn-sm" type="button" id="btnPrefillWeb">Website: Library of Congress</button>
+            <button class="btn btn-secondary btn-sm" type="button" id="btnPrefillChapter">Chapter: Morgan Puritan Ethic</button>
+          </div>
+        </div>
+
+        <!-- Step 1: Select Type -->
+        <div class="form-section">
+          <div class="form-section-title">1. Select Citation Source Type</div>
+          <div class="source-type-grid" id="sourceTypeGrid">
+            <div class="type-select-btn active" data-type="book">
+              <span class="type-icon">📚</span>
+              <span>Book</span>
+            </div>
+            <div class="type-select-btn" data-type="journal">
+              <span class="type-icon">🔬</span>
+              <span>Journal Article</span>
+            </div>
+            <div class="type-select-btn" data-type="newspaper">
+              <span class="type-icon">📰</span>
+              <span>News / Magazine</span>
+            </div>
+            <div class="type-select-btn" data-type="website">
+              <span class="type-icon">🌐</span>
+              <span>Website</span>
+            </div>
+            <div class="type-select-btn" data-type="chapter">
+              <span class="type-icon">📑</span>
+              <span>Book Chapter</span>
+            </div>
+            <div class="type-select-btn" data-type="multimedia">
+              <span class="type-icon">🎬</span>
+              <span>Film / Media</span>
+            </div>
+            <div class="type-select-btn" data-type="interview">
+              <span class="type-icon">🎙️</span>
+              <span>Interview</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: Contributors (Authors / Editors) -->
+        <div class="form-section">
+          <div class="form-section-title">
+            <span>2. Authors &amp; Contributors</span>
+            <button class="btn btn-outline-primary btn-sm" id="btnAddContributor">+ Add Another Author</button>
+          </div>
+          <div class="contributors-list" id="contributorsContainer">
+            <!-- Dynamic rows -->
+          </div>
+          <div class="field-hint">For corporate authors or organizations (e.g. "Library of Congress"), enter the organization in the Last Name field.</div>
+        </div>
+
+        <!-- Step 3: Titles & Publication Specifics -->
+        <div class="form-section">
+          <div class="form-section-title">3. Title &amp; Container</div>
+          <div class="form-row">
+            <div class="form-group" style="grid-column: 1 / -1;">
+              <label id="lblSourceTitle">Title of Book / Work *</label>
+              <input type="text" id="inpTitle" placeholder="e.g. The Warmth of Other Suns">
+              <div class="field-hint" id="hintTitle">Use headline-style capitalization as required by Chicago.</div>
+            </div>
+          </div>
+
+          <div class="form-row" id="rowContainerTitle" style="display:none;">
+            <div class="form-group" style="grid-column: 1 / -1;">
+              <label id="lblContainerTitle">Title of Journal / Book / Newspaper / Website</label>
+              <input type="text" id="inpContainerTitle" placeholder="e.g. The New York Times, or Journal of American History">
+            </div>
+          </div>
+
+          <div class="form-row" id="rowChapterFields" style="display:none;">
+            <div class="form-group">
+              <label>Book Editor(s) / Compiler</label>
+              <input type="text" id="inpBookEditor" placeholder="e.g. Henry Louis Gates Jr.">
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4: Publication & Locator Details -->
+        <div class="form-section">
+          <div class="form-section-title">4. Publication Details &amp; Locators</div>
+          <div class="form-row" id="rowPubDetails">
+            <div class="form-group">
+              <label>Publisher / Organization</label>
+              <input type="text" id="inpPublisher" placeholder="e.g. Vintage Books">
+            </div>
+            <div class="form-group" id="groupPubPlace">
+              <label>Place of Publication (City)</label>
+              <input type="text" id="inpPubPlace" placeholder="e.g. New York">
+            </div>
+            <div class="form-group">
+              <label>Year of Publication *</label>
+              <input type="text" id="inpPubYear" placeholder="e.g. 2010">
+            </div>
+          </div>
+
+          <div class="form-row" id="rowPeriodicalSpecifics" style="display:none;">
+            <div class="form-group">
+              <label>Volume</label>
+              <input type="text" id="inpVolume" placeholder="e.g. 42">
+            </div>
+            <div class="form-group">
+              <label>Issue No.</label>
+              <input type="text" id="inpIssue" placeholder="e.g. 3">
+            </div>
+            <div class="form-group">
+              <label>Exact Date (Month Day, Year)</label>
+              <input type="text" id="inpExactDate" placeholder="e.g. March 15, 2021">
+            </div>
+          </div>
+
+          <div class="form-row" id="rowPages">
+            <div class="form-group">
+              <label>Page Range (pp.)</label>
+              <input type="text" id="inpPageRange" placeholder="e.g. 142–165">
+              <div class="field-hint">Use en-dash (–) or hyphen for page ranges.</div>
+            </div>
+            <div class="form-group">
+              <label>Edition / Series</label>
+              <input type="text" id="inpEdition" placeholder="e.g. 2nd ed. or rev. ed.">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group" style="grid-column: 1 / -1;">
+              <label>DOI (Digital Object Identifier) or Stable URL</label>
+              <input type="text" id="inpUrlDoi" placeholder="e.g. https://doi.org/10.1086/678123 or https://www.nytimes.com/...">
+            </div>
+          </div>
+
+          <div class="form-row" id="rowAccessDate">
+            <div class="form-group">
+              <label>Date Accessed (if required or no pub date)</label>
+              <input type="text" id="inpAccessDate" placeholder="e.g. October 1, 2026">
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 5: Evaluation & Annotation (NoodleTools signature) -->
+        <div class="form-section">
+          <div class="form-section-title">5. Annotation (Evaluative Annotated Bibliography)</div>
+          <div class="form-group">
+            <label>Source Annotation / Summary / Evaluation</label>
+            <textarea id="inpAnnotation" rows="3" placeholder="Explain the author's argument, credibility, methodology, and how this source supports your research question..."></textarea>
+            <div class="field-hint">Annotations are formatted under the citation with a hanging indent.</div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btnCancelSource">Cancel</button>
+        <button class="btn btn-primary" id="btnSaveSource">Save Citation</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Notecard Modal -->
+  <div class="modal-overlay" id="notecardModal">
+    <div class="modal-card" style="max-width: 680px;">
+      <div class="modal-header">
+        <h2 id="notecardModalTitle">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+          Add Research Notecard
+        </h2>
+        <button class="modal-close-btn" id="btnCloseNotecardModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Notecard Title / Main Idea *</label>
+          <input type="text" id="inpNoteTitle" placeholder="e.g. Hamilton's Financial Strategy & Compromise">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Link to Citation Source</label>
+            <select id="inpNoteSourceSelect" class="filter-select"></select>
+          </div>
+          <div class="form-group">
+            <label>Page Number(s)</label>
+            <input type="text" id="inpNotePage" placeholder="e.g. p. 142 or pp. 210–215">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Direct Quotation (Verbatim from source with quotation marks)</label>
+          <textarea id="inpNoteQuote" rows="2" placeholder='"The national debt, if it is not excessive, will be to us a national blessing..."'></textarea>
+        </div>
+        <div class="form-group">
+          <label>Paraphrase / Summary in Your Own Words</label>
+          <textarea id="inpNoteParaphrase" rows="2" placeholder="Explain the argument without using the original phrasing..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>My Thoughts / Analysis / Connection to Thesis</label>
+          <textarea id="inpNoteThoughts" rows="2" placeholder="How this evidence answers your research question..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btnCancelNotecard">Cancel</button>
+        <button class="btn btn-primary" id="btnSaveNotecard">Save Notecard</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Project Settings / Thesis Modal -->
+  <div class="modal-overlay" id="projectModal">
+    <div class="modal-card" style="max-width: 600px;">
+      <div class="modal-header">
+        <h2 id="projectModalTitle">Research Project Details</h2>
+        <button class="modal-close-btn" id="btnCloseProjectModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Project Title *</label>
+          <input type="text" id="inpProjectTitle" placeholder="e.g. The Constitutional Compromises of 1787">
+        </div>
+        <div class="form-group">
+          <label>Research Question</label>
+          <input type="text" id="inpProjectQuestion" placeholder="e.g. How did regional economic rivalries shape the federal financial structure?">
+        </div>
+        <div class="form-group">
+          <label>Thesis Statement</label>
+          <textarea id="inpProjectThesis" rows="3" placeholder="State your central claim or argument clearly..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Primary Citation Style</label>
+          <select id="inpProjectStyle" class="filter-select">
+            <option value="chicago-nb">Chicago 17th/18th: Notes &amp; Bibliography</option>
+            <option value="chicago-ad">Chicago 17th/18th: Author-Date</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btnCancelProject">Cancel</button>
+        <button class="btn btn-primary" id="btnSaveProject">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Footnote & Citation Generator Assistant -->
+  <div class="modal-overlay" id="footnoteModal">
+    <div class="modal-card" style="max-width: 740px;">
+      <div class="modal-header">
+        <h2>
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+          Chicago Footnote &amp; In-Text Citation Tool
+        </h2>
+        <button class="modal-close-btn" id="btnCloseFootnoteModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:0.875rem; color:var(--text-muted);">
+          Select any source from your project and input your cited page number. The assistant instantly generates your Chicago Full Footnote, Short Footnote, Ibid., and Author-Date In-text citation ready to copy into your paper.
+        </p>
+
+        <div class="form-row">
+          <div class="form-group" style="flex:2;">
+            <label>Select Source</label>
+            <select id="toolSourceSelect" class="filter-select"></select>
+          </div>
+          <div class="form-group" style="flex:1;">
+            <label>Specific Page(s)</label>
+            <input type="text" id="toolPageInput" placeholder="e.g. 52 or 104–105" value="52">
+          </div>
+        </div>
+
+        <div class="footnote-builder-result" id="toolResultsArea">
+          <div class="footnote-card">
+            <div class="footnote-header">
+              <span class="snippet-tag">1. Chicago Full Footnote (First Occurrence)</span>
+              <button class="btn btn-outline-primary btn-sm" id="btnCopyFullNote">Copy Footnote</button>
+            </div>
+            <div class="footnote-text" id="toolFullNoteText">Select a source...</div>
+          </div>
+
+          <div class="footnote-card">
+            <div class="footnote-header">
+              <span class="snippet-tag">2. Chicago Short Footnote (Subsequent Citations)</span>
+              <button class="btn btn-outline-primary btn-sm" id="btnCopyShortNote">Copy Short Note</button>
+            </div>
+            <div class="footnote-text" id="toolShortNoteText">—</div>
+          </div>
+
+          <div class="footnote-card">
+            <div class="footnote-header">
+              <span class="snippet-tag">3. Author-Date In-Text Citation (for AD Papers)</span>
+              <button class="btn btn-outline-primary btn-sm" id="btnCopyInText">Copy In-Text</button>
+            </div>
+            <div class="footnote-text" id="toolInText">Select a source...</div>
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" id="btnDoneFootnote">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Export / Backup Modal -->
+  <div class="modal-overlay" id="exportModal">
+    <div class="modal-card" style="max-width: 580px;">
+      <div class="modal-header">
+        <h2>Export &amp; Share Bibliography</h2>
+        <button class="modal-close-btn" id="btnCloseExportModal">&times;</button>
+      </div>
+      <div class="modal-body" style="gap:1rem;">
+        <p style="font-size:0.875rem; color:var(--text-muted);">
+          Export your formatted Chicago bibliography for inclusion in Microsoft Word, Google Docs, Apple Pages, or submit online.
+        </p>
+
+        <div style="display:flex; flex-direction:column; gap:0.65rem;">
+          <button class="btn btn-secondary" id="btnExpCopyRich" style="justify-content:flex-start; padding:0.8rem 1rem;">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+            <div style="text-align:left;">
+              <div style="font-weight:600;">Copy Formatted to Clipboard</div>
+              <div style="font-size:0.775rem; color:var(--text-muted);">Preserves italics and hanging indent for pasting into Docs/Word.</div>
+            </div>
+          </button>
+
+          <button class="btn btn-secondary" id="btnExpDownloadDoc" style="justify-content:flex-start; padding:0.8rem 1rem;">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            <div style="text-align:left;">
+              <div style="font-weight:600;">Download as Word (.doc)</div>
+              <div style="font-size:0.775rem; color:var(--text-muted);">Formatted with Times New Roman 12pt, double spacing, hanging indent.</div>
+            </div>
+          </button>
+
+          <button class="btn btn-secondary" id="btnExpDownloadJSON" style="justify-content:flex-start; padding:0.8rem 1rem;">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+            <div style="text-align:left;">
+              <div style="font-weight:600;">Export Project Backup (JSON)</div>
+              <div style="font-size:0.775rem; color:var(--text-muted);">Save complete raw records and notecards to a backup file.</div>
+            </div>
+          </button>
+
+          <label class="btn btn-secondary" style="justify-content:flex-start; padding:0.8rem 1rem; cursor:pointer;">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+            <div style="text-align:left;">
+              <div style="font-weight:600;">Import Project Backup (JSON)</div>
+              <div style="font-size:0.775rem; color:var(--text-muted);">Restore citations and notecards from a previous export.</div>
+            </div>
+            <input type="file" id="inpImportFile" accept=".json" style="display:none;">
+          </label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btnCloseExport">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- APPLICATION LOGIC -->
+  <script>
+    /* ==========================================================
+       DATA MODELS & STORAGE
+       ========================================================== */
+    const STORAGE_KEY = 'noodlecite_projects_data_v1';
+    const ACTIVE_PROJECT_KEY = 'noodlecite_active_proj_id';
+
+    let appData = {
+      projects: []
+    };
+
+    let activeProjectId = null;
+    let editingSourceId = null;
+    let editingNotecardId = null;
+    let currentStyleMode = 'chicago-nb'; // 'chicago-nb' or 'chicago-ad'
+    let currentSourceType = 'book';
+
+    // Sample Benchmark Projects for NoodleTools demonstration
+    const SAMPLE_PROJECT = {
+      id: 'proj_sample_revolution',
+      title: 'The Atlantic World & The American Revolution',
+      researchQuestion: 'How did ideological exchanges across the Atlantic influence revolutionary mobilization between 1765 and 1783?',
+      thesisStatement: 'While economic grievances against parliamentary taxation sparked colonial resistance, trans-Atlantic print culture and Enlightenment philosophy forged a durable constitutional ideology that sustained the revolutionary war.',
+      style: 'chicago-nb',
+      createdDate: new Date().toISOString(),
+      sources: [
+        {
+          id: 'src_chernow',
+          type: 'book',
+          contributors: [
+            { role: 'author', firstName: 'Ron', middleName: '', lastName: 'Chernow', suffix: '' }
+          ],
+          title: 'Alexander Hamilton',
+          containerTitle: '',
+          bookEditor: '',
+          publisher: 'Penguin Books',
+          pubPlace: 'New York',
+          pubYear: '2004',
+          volume: '',
+          issue: '',
+          exactDate: '',
+          pageRange: '',
+          edition: '',
+          urlDoi: '',
+          accessDate: '',
+          annotation: 'A comprehensive, landmark biography of the first Secretary of the Treasury. Chernow provides extensive documentary evidence from Hamilton\'s early Caribbean writings and Federalist Papers, highlighting how institutional fiscal policy solidified federal constitutional sovereignty.'
+        },
+        {
+          id: 'src_bailyn',
+          type: 'book',
+          contributors: [
+            { role: 'author', firstName: 'Bernard', middleName: '', lastName: 'Bailyn', suffix: '' }
+          ],
+          title: 'The Ideological Origins of the American Revolution',
+          containerTitle: '',
+          bookEditor: '',
+          publisher: 'Belknap Press of Harvard University Press',
+          pubPlace: 'Cambridge, MA',
+          pubYear: '1967',
+          volume: '',
+          issue: '',
+          exactDate: '',
+          pageRange: '',
+          edition: '50th anniversary ed.',
+          urlDoi: '',
+          accessDate: '',
+          annotation: 'Bailyn analyzes hundreds of colonial political pamphlets to demonstrate that revolutionary radicalism derived from 18th-century English Opposition Country Party ideology and fears of parliamentary corruption.'
+        },
+        {
+          id: 'src_davis_journal',
+          type: 'journal',
+          contributors: [
+            { role: 'author', firstName: 'Natalie', middleName: 'Zemon', lastName: 'Davis', suffix: '' }
+          ],
+          title: 'The Rites of Violence: Religious Riot in Sixteenth-Century France',
+          containerTitle: 'Past & Present',
+          bookEditor: '',
+          publisher: '',
+          pubPlace: '',
+          pubYear: '1973',
+          volume: '',
+          issue: '59',
+          exactDate: '',
+          pageRange: '51–91',
+          edition: '',
+          urlDoi: 'https://doi.org/10.1093/past/59.1.51',
+          accessDate: '',
+          annotation: 'Examines social dynamics and crowd psychology in popular mobilization. While focusing on early modern France, Davis\'s framework on ritualistic legitimacy and crowd behavior offers critical methodological parallels for understanding colonial street protests such as the Stamp Act riots.'
+        },
+        {
+          id: 'src_loc_web',
+          type: 'website',
+          contributors: [
+            { role: 'author', firstName: '', middleName: '', lastName: 'Library of Congress', suffix: '' }
+          ],
+          title: 'The American Revolution: A Selected Resource Guide',
+          containerTitle: 'Library of Congress Digital Collections',
+          bookEditor: '',
+          publisher: 'Library of Congress',
+          pubPlace: '',
+          pubYear: '2022',
+          volume: '',
+          issue: '',
+          exactDate: 'July 4, 2022',
+          pageRange: '',
+          edition: '',
+          urlDoi: 'https://www.loc.gov/rr/program/bib/revwar/',
+          accessDate: 'October 1, 2026',
+          annotation: 'An archival directory indexing manuscript collections, military maps, and personal correspondence of Continental Army officers and delegates to the Second Continental Congress.'
+        },
+        {
+          id: 'src_morgan_chapter',
+          type: 'chapter',
+          contributors: [
+            { role: 'author', firstName: 'Edmund', middleName: 'S.', lastName: 'Morgan', suffix: '' }
+          ],
+          title: 'The Puritan Ethic and the American Revolution',
+          containerTitle: 'Essays on the American Revolution',
+          bookEditor: 'Stephen G. Kurtz and James H. Hutson',
+          publisher: 'University of North Carolina Press',
+          pubPlace: 'Chapel Hill',
+          pubYear: '1973',
+          volume: '',
+          issue: '',
+          exactDate: '',
+          pageRange: '3–43',
+          edition: '',
+          urlDoi: '',
+          accessDate: '',
+          annotation: 'Investigates how New England covenant theology and ascetic morals intersected with Republican non-importation agreements, framing frugality and non-consumption as civic virtue.'
+        }
+      ],
+      notecards: [
+        {
+          id: 'note_1',
+          title: 'Hamilton on Public Debt as National Cement',
+          sourceId: 'src_chernow',
+          page: 'pp. 297–299',
+          quote: '"A national debt, if it is not excessive, will be to us a national blessing. It will be a powerful cement of our Union."',
+          paraphrase: 'Hamilton maintained that assuming state debts and creating a funded national debt would align creditors\' financial interests directly with the survival and vitality of the fledgling federal government.',
+          thoughts: 'Directly reinforces my thesis: constitutional stability was achieved through deliberate institutional structures rather than purely sentimental unity.'
+        },
+        {
+          id: 'note_2',
+          title: 'Pamphlet Literature and Opposition Ideology',
+          sourceId: 'src_bailyn',
+          page: 'pp. 45–54',
+          quote: '"To the colonists the English Constitution seemed an ideal balance of forces... but they saw corruption threatening that balance at every turn."',
+          paraphrase: 'Colonists perceived imperial policies not merely as inconvenient levies, but as evidence of a coordinated conspiracy by crown ministers against constitutional liberties.',
+          thoughts: 'Essential evidence for chapter 2 showing the mindset of radical colonial leaders.'
+        }
+      ]
+    };
+
+    /* ==========================================================
+       INITIALIZATION & STORAGE FUNCTIONS
+       ========================================================== */
+    function loadData() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try {
+          appData = JSON.parse(saved);
+        } catch (e) {
+          console.error('Error parsing stored data', e);
+          appData = { projects: [SAMPLE_PROJECT] };
+        }
+      } else {
+        appData = { projects: [SAMPLE_PROJECT] };
+        saveData();
+      }
+
+      const savedActiveId = localStorage.getItem(ACTIVE_PROJECT_KEY);
+      if (savedActiveId && appData.projects.some(p => p.id === savedActiveId)) {
+        activeProjectId = savedActiveId;
+      } else if (appData.projects.length > 0) {
+        activeProjectId = appData.projects[0].id;
+      } else {
+        createNewProject('My History Paper');
+      }
+    }
+
+    function saveData() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+      if (activeProjectId) {
+        localStorage.setItem(ACTIVE_PROJECT_KEY, activeProjectId);
+      }
+    }
+
+    function getActiveProject() {
+      return appData.projects.find(p => p.id === activeProjectId) || appData.projects[0];
+    }
+
+    function showToast(message) {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerHTML = `
+        <svg width="18" height="18" fill="none" stroke="#10b981" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+        <span>${escapeHtml(message)}</span>
+      `;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        toast.style.transition = 'all 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 2600);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    /* ==========================================================
+       CHICAGO MANUAL OF STYLE CITATION ENGINE
+       ========================================================== */
+    const ChicagoEngine = {
+      
+      formatAuthors(contributors, isBibliography = true, isAuthorDate = false) {
+        if (!contributors || contributors.length === 0) return '';
+
+        const authorList = contributors.map(c => {
+          const fn = [c.firstName, c.middleName].filter(Boolean).join(' ').trim();
+          const ln = (c.lastName || '').trim();
+          const suf = c.suffix ? `, ${c.suffix.trim()}` : '';
+          return { fn, ln, suf, role: c.role || 'author' };
+        }).filter(a => a.ln || a.fn);
+
+        if (authorList.length === 0) return '';
+
+        // Single Author
+        if (authorList.length === 1) {
+          const a = authorList[0];
+          if (isBibliography) {
+            let str = a.ln ? (a.fn ? `${a.ln}, ${a.fn}${a.suf}` : `${a.ln}${a.suf}`) : a.fn;
+            if (a.role === 'editor') str += ', ed.';
+            if (a.role === 'translator') str += ', trans.';
+            if (a.role === 'compiler') str += ', comp.';
+            return str;
+          } else {
+            let str = a.fn ? `${a.fn} ${a.ln}${a.suf}` : a.ln;
+            return str;
+          }
+        }
+
+        // Two Authors
+        if (authorList.length === 2) {
+          const a1 = authorList[0];
+          const a2 = authorList[1];
+          if (isBibliography) {
+            const name1 = a1.ln ? (a1.fn ? `${a1.ln}, ${a1.fn}${a1.suf}` : a1.ln) : a1.fn;
+            const name2 = a2.fn ? `${a2.fn} ${a2.ln}${a2.suf}` : a2.ln;
+            return `${name1}, and ${name2}`;
+          } else {
+            const name1 = a1.fn ? `${a1.fn} ${a1.ln}${a1.suf}` : a1.ln;
+            const name2 = a2.fn ? `${a2.fn} ${a2.ln}${a2.suf}` : a2.ln;
+            return `${name1} and ${name2}`;
+          }
+        }
+
+        // Three Authors
+        if (authorList.length === 3) {
+          const a1 = authorList[0];
+          const a2 = authorList[1];
+          const a3 = authorList[2];
+          if (isBibliography) {
+            const name1 = a1.ln ? (a1.fn ? `${a1.ln}, ${a1.fn}${a1.suf}` : a1.ln) : a1.fn;
+            const name2 = a2.fn ? `${a2.fn} ${a2.ln}${a2.suf}` : a2.ln;
+            const name3 = a3.fn ? `${a3.fn} ${a3.ln}${a3.suf}` : a3.ln;
+            return `${name1}, ${name2}, and ${name3}`;
+          } else {
+            const name1 = a1.fn ? `${a1.fn} ${a1.ln}${a1.suf}` : a1.ln;
+            const name2 = a2.fn ? `${a2.fn} ${a2.ln}${a2.suf}` : a2.ln;
+            const name3 = a3.fn ? `${a3.fn} ${a3.ln}${a3.suf}` : a3.ln;
+            return `${name1}, ${name2}, and ${name3}`;
+          }
+        }
+
+        // Four or More Authors
+        if (authorList.length >= 4) {
+          const a1 = authorList[0];
+          if (isBibliography) {
+            const name1 = a1.ln ? (a1.fn ? `${a1.ln}, ${a1.fn}${a1.suf}` : a1.ln) : a1.fn;
+            return `${name1}, et al.`;
+          } else {
+            const name1 = a1.fn ? `${a1.fn} ${a1.ln}${a1.suf}` : a1.ln;
+            return `${name1} et al.`;
+          }
+        }
+
+        return '';
+      },
+
+      getShortTitle(title) {
+        if (!title) return '';
+        const cleaned = title.trim();
+        if (cleaned.includes(':')) {
+          const mainPart = cleaned.split(':')[0].trim();
+          if (mainPart) return mainPart;
+        }
+        let words = cleaned.split(/\s+/);
+        if (words.length > 4) {
+          words = words.slice(0, 4);
+          const stopWords = ['and', 'the', 'of', 'in', 'a', 'an', 'to', 'for', 'with', 'on', 'at', 'from', 'by'];
+          while (words.length > 1 && stopWords.includes(words[words.length - 1].toLowerCase())) {
+            words.pop();
+          }
+        }
+        return words.join(' ');
+      },
+
+      ensurePeriod(str) {
+        if (!str) return '';
+        const trimmed = str.trim();
+        if (trimmed.endsWith('.') || trimmed.endsWith('?') || trimmed.endsWith('!')) return trimmed;
+        return trimmed + '.';
+      },
+
+      ensureComma(str) {
+        if (!str) return '';
+        const trimmed = str.trim();
+        if (trimmed.endsWith(',') || trimmed.endsWith('.')) return trimmed;
+        return trimmed + ',';
+      },
+
+      // MAIN: Generate Bibliography Entry (Chicago NB or AD)
+      generateBibliography(src, styleMode = 'chicago-nb') {
+        const type = src.type || 'book';
+        const isAD = (styleMode === 'chicago-ad');
+        const authors = this.formatAuthors(src.contributors, true, isAD);
+        const title = src.title ? src.title.trim() : '';
+        const container = src.containerTitle ? src.containerTitle.trim() : '';
+        const publisher = src.publisher ? src.publisher.trim() : '';
+        const pubPlace = src.pubPlace ? src.pubPlace.trim() : '';
+        const pubYear = src.pubYear ? src.pubYear.trim() : '';
+        const vol = src.volume ? src.volume.trim() : '';
+        const iss = src.issue ? src.issue.trim() : '';
+        const exactDate = src.exactDate ? src.exactDate.trim() : '';
+        const pageRange = src.pageRange ? src.pageRange.trim() : '';
+        const ed = src.edition ? src.edition.trim() : '';
+        const editor = src.bookEditor ? src.bookEditor.trim() : '';
+        const urlDoi = src.urlDoi ? src.urlDoi.trim() : '';
+        const access = src.accessDate ? src.accessDate.trim() : '';
+
+        let out = '';
+
+        // --- AUTHOR-DATE REFERENCE LIST ---
+        if (isAD) {
+          const authPart = authors || (container || title);
+          const yearPart = pubYear || 'n.d.';
+          out += `${this.ensurePeriod(authPart)} ${yearPart}. `;
+
+          if (type === 'book') {
+            out += `<em>${title}</em>. `;
+            if (ed) out += `${this.ensurePeriod(ed)} `;
+            if (pubPlace && publisher) out += `${pubPlace}: ${publisher}.`;
+            else if (publisher) out += `${this.ensurePeriod(publisher)}`;
+            else if (pubPlace) out += `${this.ensurePeriod(pubPlace)}`;
+          } else if (type === 'journal') {
+            out += `"${this.ensurePeriod(title)}" <em>${container}</em>`;
+            if (vol && iss) out += ` ${vol} (${iss}): ${pageRange}.`;
+            else if (vol) out += ` ${vol}: ${pageRange}.`;
+            else if (iss) out += ` no. ${iss}: ${pageRange}.`;
+            else if (pageRange) out += `: ${pageRange}.`;
+            else out += '.';
+          } else if (type === 'newspaper') {
+            out += `"${this.ensurePeriod(title)}" <em>${container}</em>`;
+            if (exactDate) out += `, ${exactDate}.`;
+            else out += '.';
+          } else if (type === 'website') {
+            out += `"${this.ensurePeriod(title)}" <em>${container || publisher}</em>. `;
+            if (exactDate) out += `${exactDate}. `;
+            if (access) out += `Accessed ${access}. `;
+          } else if (type === 'chapter') {
+            out += `"${this.ensurePeriod(title)}" In <em>${container}</em>`;
+            if (editor) out += `, edited by ${editor}`;
+            if (pageRange) out += `, ${pageRange}. `;
+            else out += '. ';
+            if (pubPlace && publisher) out += `${pubPlace}: ${publisher}.`;
+            else if (publisher) out += `${this.ensurePeriod(publisher)}`;
+          } else {
+            out += `<em>${title}</em>. `;
+            if (publisher) out += `${this.ensurePeriod(publisher)}`;
+          }
+
+          out = out.trim();
+          if (urlDoi) {
+            if (!out.endsWith('.')) out += '.';
+            out += ` ${urlDoi}.`;
+          }
+          return out.trim();
+        }
+
+        // --- CHICAGO NOTES & BIBLIOGRAPHY (Standard) ---
+        if (authors) {
+          out += `${this.ensurePeriod(authors)} `;
+        }
+
+        switch (type) {
+          case 'book':
+            // Chernow, Ron. Alexander Hamilton. New York: Penguin Books, 2004.
+            if (title) out += `<em>${title}</em>. `;
+            if (ed) out += `${this.ensurePeriod(ed)} `;
+            if (pubPlace && publisher) {
+              out += `${pubPlace}: ${publisher}, ${pubYear}.`;
+            } else if (publisher) {
+              out += `${publisher}, ${pubYear}.`;
+            } else if (pubPlace) {
+              out += `${pubPlace}, ${pubYear}.`;
+            } else if (pubYear) {
+              out += `${pubYear}.`;
+            }
+            break;
+
+          case 'journal':
+            // Davis, Natalie Zemon. "The Rites of Violence: Religious Riot in Sixteenth-Century France." Past & Present, no. 59 (1973): 51–91. https://doi.org/...
+            if (title) out += `"${this.ensurePeriod(title)}" `;
+            if (container) out += `<em>${container}</em>`;
+            if (vol && iss) {
+              out += ` ${vol}, no. ${iss} (${pubYear || 'n.d.'}): ${pageRange}.`;
+            } else if (vol) {
+              out += ` ${vol} (${pubYear || 'n.d.'}): ${pageRange}.`;
+            } else if (iss) {
+              out += `, no. ${iss} (${pubYear || 'n.d.'}): ${pageRange}.`;
+            } else if (pubYear) {
+              out += ` (${pubYear}): ${pageRange}.`;
+            } else if (pageRange) {
+              out += `: ${pageRange}.`;
+            } else {
+              out += '.';
+            }
+            break;
+
+          case 'newspaper':
+            // Last, First. "Article Title." Newspaper Name, Month Day, Year.
+            if (title) out += `"${this.ensurePeriod(title)}" `;
+            if (container) out += `<em>${container}</em>`;
+            if (exactDate) {
+              out += `, ${exactDate}.`;
+            } else if (pubYear) {
+              out += `, ${pubYear}.`;
+            } else {
+              out += '.';
+            }
+            break;
+
+          case 'website':
+            // Author / Organization. "Page Title." Website Name. Publisher, Date. Accessed Date. URL.
+            if (title) out += `"${this.ensurePeriod(title)}" `;
+            if (container) out += `<em>${container}</em>. `;
+            if (publisher && publisher !== container) out += `${publisher}, `;
+            if (exactDate) out += `${exactDate}. `;
+            else if (pubYear) out += `${pubYear}. `;
+            if (access) out += `Accessed ${access}. `;
+            break;
+
+          case 'chapter':
+            // Author. "Chapter Title." In Book Title, edited by Editor Name, pp–pp. City: Publisher, Year.
+            if (title) out += `"${this.ensurePeriod(title)}" `;
+            out += `In <em>${container || 'Book Title'}</em>`;
+            if (editor) out += `, edited by ${editor}`;
+            if (pageRange) out += `, ${pageRange}. `;
+            else out += '. ';
+            if (pubPlace && publisher) {
+              out += `${pubPlace}: ${publisher}, ${pubYear}.`;
+            } else if (publisher) {
+              out += `${publisher}, ${pubYear}.`;
+            } else if (pubYear) {
+              out += `${pubYear}.`;
+            }
+            break;
+
+          case 'multimedia':
+            if (title) out += `<em>${title}</em>. `;
+            if (publisher) out += `${publisher}, `;
+            if (pubYear) out += `${pubYear}.`;
+            break;
+
+          case 'interview':
+            if (title) out += `Interview by ${title}. `;
+            if (exactDate) out += `${exactDate}.`;
+            break;
+
+          default:
+            if (title) out += `<em>${title}</em>. `;
+            if (publisher) out += `${publisher}, `;
+            if (pubYear) out += `${pubYear}.`;
+            break;
+        }
+
+        out = out.trim();
+        if (urlDoi) {
+          if (!out.endsWith('.')) out += '.';
+          out += ` ${urlDoi}.`;
+        }
+
+        return out.trim();
+      },
+
+      // Generate Full Footnote (Note 1)
+      generateFootnote(src, specificPage = '') {
+        const type = src.type || 'book';
+        const authors = this.formatAuthors(src.contributors, false, false);
+        const title = src.title ? src.title.trim() : '';
+        const container = src.containerTitle ? src.containerTitle.trim() : '';
+        const publisher = src.publisher ? src.publisher.trim() : '';
+        const pubPlace = src.pubPlace ? src.pubPlace.trim() : '';
+        const pubYear = src.pubYear ? src.pubYear.trim() : '';
+        const vol = src.volume ? src.volume.trim() : '';
+        const iss = src.issue ? src.issue.trim() : '';
+        const exactDate = src.exactDate ? src.exactDate.trim() : '';
+        const pageRange = specificPage || src.pageRange || '';
+        const ed = src.edition ? src.edition.trim() : '';
+        const editor = src.bookEditor ? src.bookEditor.trim() : '';
+        const urlDoi = src.urlDoi ? src.urlDoi.trim() : '';
+        const access = src.accessDate ? src.accessDate.trim() : '';
+
+        let out = '';
+
+        if (authors) {
+          out += `${authors}, `;
+        }
+
+        switch (type) {
+          case 'book':
+            // 1. Ron Chernow, Alexander Hamilton (New York: Penguin Books, 2004), 52.
+            out += `<em>${title || 'Untitled'}</em>`;
+            if (ed) out += `, ${ed}`;
+            let pubInfo = [];
+            if (pubPlace && publisher) pubInfo.push(`${pubPlace}: ${publisher}`);
+            else if (publisher) pubInfo.push(publisher);
+            else if (pubPlace) pubInfo.push(pubPlace);
+            if (pubYear) pubInfo.push(pubYear);
+
+            if (pubInfo.length > 0) {
+              out += ` (${pubInfo.join(', ')})`;
+            }
+            if (pageRange) out += `, ${pageRange}.`;
+            else out += '.';
+            break;
+
+          case 'journal':
+            // 1. Natalie Zemon Davis, "The Rites of Violence: Religious Riot in Sixteenth-Century France," Past & Present, no. 59 (1973): 55, https://doi.org/...
+            out += `"${title},"`;
+            if (container) out += ` <em>${container}</em>`;
+            if (vol && iss) out += ` ${vol}, no. ${iss}`;
+            else if (vol) out += ` ${vol}`;
+            else if (iss) out += `, no. ${iss}`;
+            if (pubYear) out += ` (${pubYear})`;
+            if (pageRange) out += `: ${pageRange}`;
+            if (urlDoi) out += `, ${urlDoi}`;
+            out += '.';
+            break;
+
+          case 'newspaper':
+            // 1. First Last, "Article Title," Newspaper Name, Month Day, Year, URL.
+            out += `"${title},"`;
+            if (container) out += ` <em>${container}</em>`;
+            if (exactDate) out += `, ${exactDate}`;
+            else if (pubYear) out += `, ${pubYear}`;
+            if (pageRange) out += `, ${pageRange}`;
+            if (urlDoi) out += `, ${urlDoi}`;
+            out += '.';
+            break;
+
+          case 'website':
+            // 1. Library of Congress, "Page Title," Website Name, Month Day, Year, accessed Month Day, URL.
+            out += `"${title},"`;
+            if (container) out += ` <em>${container}</em>`;
+            if (publisher && publisher !== container) out += `, ${publisher}`;
+            if (exactDate) out += `, ${exactDate}`;
+            if (access) out += `, accessed ${access}`;
+            if (urlDoi) out += `, ${urlDoi}`;
+            out += '.';
+            break;
+
+          case 'chapter':
+            // 1. Author, "Chapter Title," in Book Title, ed. Editor (City: Pub, Year), 15.
+            out += `"${title}," in <em>${container}</em>`;
+            if (editor) out += `, ed. ${editor}`;
+            let chPubInfo = [];
+            if (pubPlace && publisher) chPubInfo.push(`${pubPlace}: ${publisher}`);
+            else if (publisher) chPubInfo.push(publisher);
+            if (pubYear) chPubInfo.push(pubYear);
+            if (chPubInfo.length > 0) out += ` (${chPubInfo.join(', ')})`;
+            if (pageRange) out += `, ${pageRange}.`;
+            else out += '.';
+            break;
+
+          default:
+            out += `<em>${title}</em>`;
+            if (publisher) out += `, ${publisher}`;
+            if (pubYear) out += `, ${pubYear}`;
+            if (pageRange) out += `, ${pageRange}.`;
+            else out += '.';
+            break;
+        }
+
+        return out.trim();
+      },
+
+      // Generate Short Footnote (Subsequent citation)
+      generateShortFootnote(src, specificPage = '') {
+        const authors = src.contributors || [];
+        const authorStr = authors.length > 0 ? (authors[0].lastName || authors[0].firstName) : (src.containerTitle || 'Author');
+        const shortTitle = this.getShortTitle(src.title);
+        const page = specificPage || (src.pageRange ? src.pageRange.split(/–|-/)[0] : '52');
+
+        const isJournalOrArticle = ['journal', 'newspaper', 'website', 'chapter'].includes(src.type);
+        const titleFormatted = isJournalOrArticle ? `"${shortTitle},"` : `<em>${shortTitle}</em>,`;
+
+        return `${authorStr}, ${titleFormatted} ${page}.`;
+      },
+
+      // Generate Author-Date In-text citation
+      generateInTextCitation(src, specificPage = '') {
+        const authors = src.contributors || [];
+        const authorStr = authors.length > 0 ? (authors[0].lastName || authors[0].firstName) : (src.containerTitle || 'Author');
+        const year = src.pubYear || 'n.d.';
+        const page = specificPage || '';
+
+        if (page) {
+          return `(${authorStr} ${year}, ${page})`;
+        }
+        return `(${authorStr} ${year})`;
+      }
+    };
+
+    /* ==========================================================
+       UI RENDERING & EVENT CONTROLLERS
+       ========================================================== */
+    function renderApp() {
+      const proj = getActiveProject();
+      if (!proj) return;
+
+      // Update project bar selector
+      const sel = document.getElementById('projectSelect');
+      sel.innerHTML = '';
+      appData.projects.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.id;
+        opt.textContent = p.title;
+        if (p.id === proj.id) opt.selected = true;
+        sel.appendChild(opt);
+      });
+
+      // Update project overview
+      document.getElementById('displayProjectTitle').textContent = proj.title;
+      document.getElementById('displayProjectThesis').innerHTML = proj.thesisStatement
+        ? `<strong>Thesis / Research Question:</strong> ${escapeHtml(proj.thesisStatement)}`
+        : `<em>No research question or thesis statement defined. Click "Edit Thesis / Details" to set one.</em>`;
+
+      // Update stats
+      const sources = proj.sources || [];
+      const notes = proj.notecards || [];
+      document.getElementById('statSourceCount').textContent = sources.length;
+      document.getElementById('badgeSourcesCount').textContent = sources.length;
+      document.getElementById('statBookCount').textContent = sources.filter(s => s.type === 'book').length;
+      document.getElementById('statArticleCount').textContent = sources.filter(s => s.type === 'journal' || s.type === 'newspaper').length;
+      document.getElementById('statWebCount').textContent = sources.filter(s => s.type === 'website').length;
+      document.getElementById('statNoteCount').textContent = notes.length;
+      document.getElementById('badgeNotecardsCount').textContent = notes.length;
+
+      // Sync style buttons
+      currentStyleMode = proj.style || 'chicago-nb';
+      if (currentStyleMode === 'chicago-nb') {
+        document.getElementById('btnModeNB').classList.add('active');
+        document.getElementById('btnModeAD').classList.remove('active');
+      } else {
+        document.getElementById('btnModeAD').classList.add('active');
+        document.getElementById('btnModeNB').classList.remove('active');
+      }
+
+      renderSourcesList();
+      renderNotecardsGrid();
+      renderPaperPreview();
+      populateToolSourceSelect();
+    }
+
+    function getFilteredAndSortedSources() {
+      const proj = getActiveProject();
+      let list = [...(proj.sources || [])];
+
+      const query = document.getElementById('searchInput').value.toLowerCase().trim();
+      const filter = document.getElementById('filterType').value;
+      const sort = document.getElementById('sortOrder').value;
+
+      if (filter !== 'all') {
+        list = list.filter(s => s.type === filter);
+      }
+
+      if (query) {
+        list = list.filter(s => {
+          const authStr = (s.contributors || []).map(c => `${c.firstName} ${c.lastName}`).join(' ').toLowerCase();
+          const titleStr = (s.title || '').toLowerCase();
+          const containerStr = (s.containerTitle || '').toLowerCase();
+          const annotStr = (s.annotation || '').toLowerCase();
+          return authStr.includes(query) || titleStr.includes(query) || containerStr.includes(query) || annotStr.includes(query);
+        });
+      }
+
+      // Sorting
+      if (sort === 'author-az') {
+        list.sort((a, b) => {
+          const aAuth = (a.contributors && a.contributors[0] && a.contributors[0].lastName) || a.title || '';
+          const bAuth = (b.contributors && b.contributors[0] && b.contributors[0].lastName) || b.title || '';
+          return aAuth.localeCompare(bAuth);
+        });
+      } else if (sort === 'year-desc') {
+        list.sort((a, b) => (parseInt(b.pubYear) || 0) - (parseInt(a.pubYear) || 0));
+      } else if (sort === 'year-asc') {
+        list.sort((a, b) => (parseInt(a.pubYear) || 0) - (parseInt(b.pubYear) || 0));
+      }
+
+      return list;
+    }
+
+    function renderSourcesList() {
+      const container = document.getElementById('sourcesList');
+      container.innerHTML = '';
+      const sources = getFilteredAndSortedSources();
+      const showAnnotations = document.getElementById('chkToggleAnnotations').checked;
+
+      if (sources.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📖</div>
+            <div class="empty-state-title">No Citations Found</div>
+            <div class="empty-state-desc">Your bibliography is currently empty. Click <strong>+ New Source</strong> to cite a book, article, or website, or click <strong>Load Sample Project</strong> to view examples.</div>
+            <button class="btn btn-primary" onclick="openSourceModal()">+ New Source</button>
+          </div>
+        `;
+        return;
+      }
+
+      sources.forEach(src => {
+        const item = document.createElement('div');
+        item.className = 'source-item';
+
+        const bibText = ChicagoEngine.generateBibliography(src, currentStyleMode);
+        const fullFootnote = ChicagoEngine.generateFootnote(src, src.pageRange ? src.pageRange.split(/–|-/)[0] : '15');
+        const shortFootnote = ChicagoEngine.generateShortFootnote(src, '15');
+        const inText = ChicagoEngine.generateInTextCitation(src, '15');
+
+        let typeBadgeClass = 'type-' + (src.type || 'book');
+        let typeName = (src.type || 'Book').toUpperCase();
+
+        item.innerHTML = `
+          <div class="source-header-meta">
+            <span class="source-type-pill ${typeBadgeClass}">${typeName}</span>
+            <div class="source-actions">
+              <button class="btn btn-secondary btn-sm" onclick="openFootnoteModalFor('${src.id}')" title="Generate Footnotes for this source">
+                Footnotes
+              </button>
+              <button class="btn btn-secondary btn-sm" onclick="addNotecardForSource('${src.id}')" title="Add notecard for this source">
+                + Notecard
+              </button>
+              <button class="btn btn-secondary btn-sm" onclick="copyCitationText('${escapeHtml(bibText)}')">
+                Copy
+              </button>
+              <button class="btn btn-icon btn-sm" onclick="editSource('${src.id}')" title="Edit source">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+              </button>
+              <button class="btn btn-icon btn-sm" onclick="deleteSource('${src.id}')" title="Delete source" style="color:#ef4444;">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="citation-box">
+            <div class="chicago-formatted-entry">${bibText}</div>
+          </div>
+
+          <div class="citation-snippets-bar">
+            <span class="snippet-tag">Footnote Preview:</span>
+            <div class="snippet-preview" title="${escapeHtml(fullFootnote)}">1. ${fullFootnote}</div>
+            <span class="snippet-tag">Short:</span>
+            <div class="snippet-preview" style="max-width:260px;" title="${escapeHtml(shortFootnote)}">${shortFootnote}</div>
+            <span class="snippet-tag">In-Text:</span>
+            <div class="snippet-preview" style="max-width:180px;" title="${escapeHtml(inText)}">${inText}</div>
+          </div>
+
+          ${showAnnotations && src.annotation ? `
+            <div class="source-annotation">
+              <strong>Evaluation / Annotation:</strong>
+              ${escapeHtml(src.annotation)}
+            </div>
+          ` : ''}
+        `;
+
+        container.appendChild(item);
+      });
+    }
+
+    function renderNotecardsGrid() {
+      const grid = document.getElementById('notecardsGrid');
+      grid.innerHTML = '';
+      const proj = getActiveProject();
+      const notecards = proj.notecards || [];
+
+      if (notecards.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-state" style="grid-column: 1 / -1;">
+            <div class="empty-state-icon">📝</div>
+            <div class="empty-state-title">No Research Notecards</div>
+            <div class="empty-state-desc">Capture direct quotations, paraphrases, and your original thoughts linked to your sources. Click <strong>+ New Notecard</strong> to start.</div>
+            <button class="btn btn-primary" onclick="openNotecardModal()">+ New Notecard</button>
+          </div>
+        `;
+        return;
+      }
+
+      notecards.forEach(note => {
+        const linkedSource = (proj.sources || []).find(s => s.id === note.sourceId);
+        const sourceName = linkedSource ? (linkedSource.title || 'Untitled Source') : 'General Project Note';
+
+        const card = document.createElement('div');
+        card.className = 'notecard-item';
+        card.innerHTML = `
+          <div class="notecard-header">
+            <div>
+              <div class="notecard-title">${escapeHtml(note.title)}</div>
+              <div class="notecard-source-ref">
+                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                ${escapeHtml(sourceName)} ${note.page ? `(${escapeHtml(note.page)})` : ''}
+              </div>
+            </div>
+            <div style="display:flex; gap:0.25rem;">
+              <button class="btn btn-icon btn-sm" onclick="editNotecard('${note.id}')" title="Edit">
+                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+              </button>
+              <button class="btn btn-icon btn-sm" onclick="deleteNotecard('${note.id}')" title="Delete" style="color:#ef4444;">
+                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+              </button>
+            </div>
+          </div>
+
+          ${note.quote ? `
+            <div class="notecard-section section-quote">
+              <span class="notecard-label">Direct Quotation</span>
+              ${escapeHtml(note.quote)}
+            </div>
+          ` : ''}
+
+          ${note.paraphrase ? `
+            <div class="notecard-section section-paraphrase">
+              <span class="notecard-label">Paraphrase / Summary</span>
+              ${escapeHtml(note.paraphrase)}
+            </div>
+          ` : ''}
+
+          ${note.thoughts ? `
+            <div class="notecard-section section-thoughts">
+              <span class="notecard-label">My Analysis / Thesis Link</span>
+              ${escapeHtml(note.thoughts)}
+            </div>
+          ` : ''}
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function renderPaperPreview() {
+      const container = document.getElementById('bibPaperContent');
+      const proj = getActiveProject();
+      const sources = [...(proj.sources || [])];
+
+      // Alphabetical order A-Z by author's last name or title (Chicago Rule)
+      sources.sort((a, b) => {
+        const aAuth = (a.contributors && a.contributors[0] && a.contributors[0].lastName) || a.title || '';
+        const bAuth = (b.contributors && b.contributors[0] && b.contributors[0].lastName) || b.title || '';
+        return aAuth.localeCompare(bAuth);
+      });
+
+      const headerTitle = (currentStyleMode === 'chicago-ad') ? 'References' : 'Bibliography';
+
+      let html = `<div class="bib-paper-title">${headerTitle}</div>`;
+
+      if (sources.length === 0) {
+        html += `<p style="text-align:center; color:#6b7280; font-family:var(--font-bib);">[No sources added yet. Add citations to preview your formal bibliography.]</p>`;
+      } else {
+        sources.forEach(src => {
+          const bibText = ChicagoEngine.generateBibliography(src, currentStyleMode);
+          html += `<div class="bib-paper-entry">${bibText}</div>`;
+          if (src.annotation) {
+            html += `<div class="bib-paper-annotation">${escapeHtml(src.annotation)}</div>`;
+          }
+        });
+      }
+
+      container.innerHTML = html;
+    }
+
+    /* ==========================================================
+       MODAL WIZARDS & FORM CONTROLLERS
+       ========================================================== */
+    function openSourceModal(sourceId = null) {
+      editingSourceId = sourceId;
+      const modal = document.getElementById('sourceModal');
+      const titleEl = document.getElementById('sourceModalTitle');
+      const contributorsContainer = document.getElementById('contributorsContainer');
+      contributorsContainer.innerHTML = '';
+
+      if (sourceId) {
+        titleEl.textContent = 'Edit Citation Source';
+        const proj = getActiveProject();
+        const src = proj.sources.find(s => s.id === sourceId);
+        if (src) {
+          selectSourceType(src.type || 'book');
+          (src.contributors || []).forEach(c => addContributorRow(c.role, c.firstName, c.middleName, c.lastName, c.suffix));
+          document.getElementById('inpTitle').value = src.title || '';
+          document.getElementById('inpContainerTitle').value = src.containerTitle || '';
+          document.getElementById('inpBookEditor').value = src.bookEditor || '';
+          document.getElementById('inpPublisher').value = src.publisher || '';
+          document.getElementById('inpPubPlace').value = src.pubPlace || '';
+          document.getElementById('inpPubYear').value = src.pubYear || '';
+          document.getElementById('inpVolume').value = src.volume || '';
+          document.getElementById('inpIssue').value = src.issue || '';
+          document.getElementById('inpExactDate').value = src.exactDate || '';
+          document.getElementById('inpPageRange').value = src.pageRange || '';
+          document.getElementById('inpEdition').value = src.edition || '';
+          document.getElementById('inpUrlDoi').value = src.urlDoi || '';
+          document.getElementById('inpAccessDate').value = src.accessDate || '';
+          document.getElementById('inpAnnotation').value = src.annotation || '';
+        }
+      } else {
+        titleEl.textContent = 'Add Citation Source';
+        selectSourceType('book');
+        // Clear all fields
+        addContributorRow('author', '', '', '', '');
+        document.getElementById('inpTitle').value = '';
+        document.getElementById('inpContainerTitle').value = '';
+        document.getElementById('inpBookEditor').value = '';
+        document.getElementById('inpPublisher').value = '';
+        document.getElementById('inpPubPlace').value = '';
+        document.getElementById('inpPubYear').value = '';
+        document.getElementById('inpVolume').value = '';
+        document.getElementById('inpIssue').value = '';
+        document.getElementById('inpExactDate').value = '';
+        document.getElementById('inpPageRange').value = '';
+        document.getElementById('inpEdition').value = '';
+        document.getElementById('inpUrlDoi').value = '';
+        document.getElementById('inpAccessDate').value = '';
+        document.getElementById('inpAnnotation').value = '';
+      }
+
+      updateModalLivePreview();
+      modal.classList.add('active');
+    }
+
+    function closeSourceModal() {
+      document.getElementById('sourceModal').classList.remove('active');
+      editingSourceId = null;
+    }
+
+    function selectSourceType(type) {
+      currentSourceType = type;
+      document.querySelectorAll('#sourceTypeGrid .type-select-btn').forEach(btn => {
+        if (btn.getAttribute('data-type') === type) btn.classList.add('active');
+        else btn.classList.remove('active');
+      });
+
+      const lblSourceTitle = document.getElementById('lblSourceTitle');
+      const hintTitle = document.getElementById('hintTitle');
+      const rowContainerTitle = document.getElementById('rowContainerTitle');
+      const lblContainerTitle = document.getElementById('lblContainerTitle');
+      const rowChapterFields = document.getElementById('rowChapterFields');
+      const rowPeriodicalSpecifics = document.getElementById('rowPeriodicalSpecifics');
+      const groupPubPlace = document.getElementById('groupPubPlace');
+      const rowAccessDate = document.getElementById('rowAccessDate');
+
+      // Defaults
+      rowContainerTitle.style.display = 'none';
+      rowChapterFields.style.display = 'none';
+      rowPeriodicalSpecifics.style.display = 'none';
+      groupPubPlace.style.display = 'flex';
+      rowAccessDate.style.display = 'none';
+
+      if (type === 'book') {
+        lblSourceTitle.textContent = 'Book Title *';
+        hintTitle.textContent = 'Capitalize headline-style. Italics will be applied automatically.';
+      } else if (type === 'journal') {
+        lblSourceTitle.textContent = 'Article Title *';
+        hintTitle.textContent = 'Enclosed in quotation marks automatically.';
+        rowContainerTitle.style.display = 'grid';
+        lblContainerTitle.textContent = 'Journal / Periodical Name *';
+        rowPeriodicalSpecifics.style.display = 'grid';
+        groupPubPlace.style.display = 'none';
+      } else if (type === 'newspaper') {
+        lblSourceTitle.textContent = 'Article / Column Title *';
+        rowContainerTitle.style.display = 'grid';
+        lblContainerTitle.textContent = 'Newspaper / Magazine Name *';
+        rowPeriodicalSpecifics.style.display = 'grid';
+        groupPubPlace.style.display = 'none';
+      } else if (type === 'website') {
+        lblSourceTitle.textContent = 'Webpage / Document Title *';
+        rowContainerTitle.style.display = 'grid';
+        lblContainerTitle.textContent = 'Website Name (Container)';
+        groupPubPlace.style.display = 'none';
+        rowAccessDate.style.display = 'grid';
+      } else if (type === 'chapter') {
+        lblSourceTitle.textContent = 'Chapter or Essay Title *';
+        rowContainerTitle.style.display = 'grid';
+        lblContainerTitle.textContent = 'Book / Anthology Title *';
+        rowChapterFields.style.display = 'grid';
+      } else if (type === 'multimedia') {
+        lblSourceTitle.textContent = 'Film / Episode / Work Title *';
+        rowContainerTitle.style.display = 'grid';
+        lblContainerTitle.textContent = 'Series / Program / Distributor';
+      } else if (type === 'interview') {
+        lblSourceTitle.textContent = 'Interviewer / Topic';
+        groupPubPlace.style.display = 'none';
+      }
+
+      updateModalLivePreview();
+    }
+
+    function addContributorRow(role = 'author', fn = '', mn = '', ln = '', suf = '') {
+      const container = document.getElementById('contributorsContainer');
+      const row = document.createElement('div');
+      row.className = 'contributor-row';
+      row.innerHTML = `
+        <select class="filter-select c-role" style="font-size:0.8rem;">
+          <option value="author" ${role === 'author' ? 'selected' : ''}>Author</option>
+          <option value="editor" ${role === 'editor' ? 'selected' : ''}>Editor</option>
+          <option value="translator" ${role === 'translator' ? 'selected' : ''}>Translator</option>
+          <option value="compiler" ${role === 'compiler' ? 'selected' : ''}>Compiler</option>
+        </select>
+        <input type="text" class="c-fn" placeholder="First Name" value="${escapeHtml(fn)}">
+        <input type="text" class="c-mn" placeholder="Middle" value="${escapeHtml(mn)}">
+        <input type="text" class="c-ln" placeholder="Last Name / Org" value="${escapeHtml(ln)}">
+        <button class="remove-btn" title="Remove contributor" onclick="this.parentElement.remove(); updateModalLivePreview();">&times;</button>
+      `;
+
+      row.querySelectorAll('input, select').forEach(el => {
+        el.addEventListener('input', updateModalLivePreview);
+      });
+
+      container.appendChild(row);
+    }
+
+    function collectSourceFromModal() {
+      const contributors = [];
+      document.querySelectorAll('#contributorsContainer .contributor-row').forEach(row => {
+        const role = row.querySelector('.c-role').value;
+        const firstName = row.querySelector('.c-fn').value.trim();
+        const middleName = row.querySelector('.c-mn').value.trim();
+        const lastName = row.querySelector('.c-ln').value.trim();
+        if (firstName || lastName) {
+          contributors.push({ role, firstName, middleName, lastName, suffix: '' });
+        }
+      });
+
+      return {
+        id: editingSourceId || ('src_' + Date.now()),
+        type: currentSourceType,
+        contributors,
+        title: document.getElementById('inpTitle').value.trim(),
+        containerTitle: document.getElementById('inpContainerTitle').value.trim(),
+        bookEditor: document.getElementById('inpBookEditor').value.trim(),
+        publisher: document.getElementById('inpPublisher').value.trim(),
+        pubPlace: document.getElementById('inpPubPlace').value.trim(),
+        pubYear: document.getElementById('inpPubYear').value.trim(),
+        volume: document.getElementById('inpVolume').value.trim(),
+        issue: document.getElementById('inpIssue').value.trim(),
+        exactDate: document.getElementById('inpExactDate').value.trim(),
+        pageRange: document.getElementById('inpPageRange').value.trim(),
+        edition: document.getElementById('inpEdition').value.trim(),
+        urlDoi: document.getElementById('inpUrlDoi').value.trim(),
+        accessDate: document.getElementById('inpAccessDate').value.trim(),
+        annotation: document.getElementById('inpAnnotation').value.trim()
+      };
+    }
+
+    function updateModalLivePreview() {
+      const src = collectSourceFromModal();
+      const bib = ChicagoEngine.generateBibliography(src, currentStyleMode);
+      const fullNote = ChicagoEngine.generateFootnote(src, src.pageRange ? src.pageRange.split(/–|-/)[0] : '24');
+      const shortNote = ChicagoEngine.generateShortFootnote(src, '24');
+
+      document.getElementById('modalLiveBibPreview').innerHTML = bib || '<em>Fill in fields to preview citation...</em>';
+      document.getElementById('modalLiveNotePreview').innerHTML = fullNote ? `1. ${fullNote}` : '—';
+      document.getElementById('modalLiveShortNotePreview').innerHTML = shortNote || '—';
+      document.getElementById('previewStyleIndicator').textContent = (currentStyleMode === 'chicago-ad') ? 'Author-Date System' : 'Notes & Bibliography System';
+    }
+
+    function saveSource() {
+      const src = collectSourceFromModal();
+      if (!src.title && src.contributors.length === 0) {
+        alert('Please enter at least an author name or a work title.');
+        return;
+      }
+
+      const proj = getActiveProject();
+      if (!proj.sources) proj.sources = [];
+
+      if (editingSourceId) {
+        const idx = proj.sources.findIndex(s => s.id === editingSourceId);
+        if (idx !== -1) proj.sources[idx] = src;
+        showToast('Citation updated successfully');
+      } else {
+        proj.sources.push(src);
+        showToast('New citation added to bibliography');
+      }
+
+      saveData();
+      closeSourceModal();
+      renderApp();
+    }
+
+    function editSource(id) {
+      openSourceModal(id);
+    }
+
+    function deleteSource(id) {
+      if (!confirm('Are you sure you want to delete this citation?')) return;
+      const proj = getActiveProject();
+      proj.sources = (proj.sources || []).filter(s => s.id !== id);
+      // Also clean up linked notecards
+      proj.notecards = (proj.notecards || []).filter(n => n.sourceId !== id);
+      saveData();
+      renderApp();
+      showToast('Citation deleted');
+    }
+
+    /* ==========================================================
+       NOTECARDS LOGIC
+       ========================================================== */
+    function openNotecardModal(noteId = null, prefilledSourceId = null) {
+      editingNotecardId = noteId;
+      const modal = document.getElementById('notecardModal');
+      const proj = getActiveProject();
+
+      const sel = document.getElementById('inpNoteSourceSelect');
+      sel.innerHTML = '<option value="">-- General Project Note (No Specific Source) --</option>';
+      (proj.sources || []).forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.id;
+        opt.textContent = `${s.contributors && s.contributors[0] ? s.contributors[0].lastName + ': ' : ''}${s.title || 'Untitled'}`;
+        sel.appendChild(opt);
+      });
+
+      if (noteId) {
+        const note = (proj.notecards || []).find(n => n.id === noteId);
+        if (note) {
+          document.getElementById('notecardModalTitle').textContent = 'Edit Notecard';
+          document.getElementById('inpNoteTitle').value = note.title || '';
+          document.getElementById('inpNoteSourceSelect').value = note.sourceId || '';
+          document.getElementById('inpNotePage').value = note.page || '';
+          document.getElementById('inpNoteQuote').value = note.quote || '';
+          document.getElementById('inpNoteParaphrase').value = note.paraphrase || '';
+          document.getElementById('inpNoteThoughts').value = note.thoughts || '';
+        }
+      } else {
+        document.getElementById('notecardModalTitle').textContent = 'Add Research Notecard';
+        document.getElementById('inpNoteTitle').value = '';
+        document.getElementById('inpNoteSourceSelect').value = prefilledSourceId || '';
+        document.getElementById('inpNotePage').value = '';
+        document.getElementById('inpNoteQuote').value = '';
+        document.getElementById('inpNoteParaphrase').value = '';
+        document.getElementById('inpNoteThoughts').value = '';
+      }
+
+      modal.classList.add('active');
+    }
+
+    function addNotecardForSource(sourceId) {
+      openNotecardModal(null, sourceId);
+    }
+
+    function closeNotecardModal() {
+      document.getElementById('notecardModal').classList.remove('active');
+      editingNotecardId = null;
+    }
+
+    function saveNotecard() {
+      const title = document.getElementById('inpNoteTitle').value.trim();
+      if (!title) {
+        alert('Please give your notecard a title or main idea.');
+        return;
+      }
+
+      const notecard = {
+        id: editingNotecardId || ('note_' + Date.now()),
+        title,
+        sourceId: document.getElementById('inpNoteSourceSelect').value,
+        page: document.getElementById('inpNotePage').value.trim(),
+        quote: document.getElementById('inpNoteQuote').value.trim(),
+        paraphrase: document.getElementById('inpNoteParaphrase').value.trim(),
+        thoughts: document.getElementById('inpNoteThoughts').value.trim()
+      };
+
+      const proj = getActiveProject();
+      if (!proj.notecards) proj.notecards = [];
+
+      if (editingNotecardId) {
+        const idx = proj.notecards.findIndex(n => n.id === editingNotecardId);
+        if (idx !== -1) proj.notecards[idx] = notecard;
+        showToast('Notecard updated');
+      } else {
+        proj.notecards.push(notecard);
+        showToast('Notecard created');
+      }
+
+      saveData();
+      closeNotecardModal();
+      renderApp();
+    }
+
+    function editNotecard(id) {
+      openNotecardModal(id);
+    }
+
+    function deleteNotecard(id) {
+      if (!confirm('Are you sure you want to delete this notecard?')) return;
+      const proj = getActiveProject();
+      proj.notecards = (proj.notecards || []).filter(n => n.id !== id);
+      saveData();
+      renderApp();
+      showToast('Notecard deleted');
+    }
+
+    /* ==========================================================
+       PROJECT SETTINGS & MANAGEMENT
+       ========================================================== */
+    function openProjectModal() {
+      const proj = getActiveProject();
+      document.getElementById('inpProjectTitle').value = proj.title || '';
+      document.getElementById('inpProjectQuestion').value = proj.researchQuestion || '';
+      document.getElementById('inpProjectThesis').value = proj.thesisStatement || '';
+      document.getElementById('inpProjectStyle').value = proj.style || 'chicago-nb';
+      document.getElementById('projectModal').classList.add('active');
+    }
+
+    function closeProjectModal() {
+      document.getElementById('projectModal').classList.remove('active');
+    }
+
+    function saveProjectSettings() {
+      const title = document.getElementById('inpProjectTitle').value.trim();
+      if (!title) {
+        alert('Please enter a project title.');
+        return;
+      }
+      const proj = getActiveProject();
+      proj.title = title;
+      proj.researchQuestion = document.getElementById('inpProjectQuestion').value.trim();
+      proj.thesisStatement = document.getElementById('inpProjectThesis').value.trim();
+      proj.style = document.getElementById('inpProjectStyle').value;
+
+      saveData();
+      closeProjectModal();
+      renderApp();
+      showToast('Project details saved');
+    }
+
+    function createNewProject(defaultTitle = '') {
+      const title = prompt('Enter a name for your new research project:', defaultTitle || 'New Research Paper');
+      if (!title) return;
+
+      const newProj = {
+        id: 'proj_' + Date.now(),
+        title: title.trim(),
+        researchQuestion: '',
+        thesisStatement: '',
+        style: 'chicago-nb',
+        createdDate: new Date().toISOString(),
+        sources: [],
+        notecards: []
+      };
+
+      appData.projects.push(newProj);
+      activeProjectId = newProj.id;
+      saveData();
+      renderApp();
+      showToast(`Created project: ${newProj.title}`);
+    }
+
+    /* ==========================================================
+       CITATION & FOOTNOTE ASSISTANT TOOL
+       ========================================================== */
+    function openFootnoteModalFor(sourceId = null) {
+      const proj = getActiveProject();
+      const sources = proj.sources || [];
+      if (sources.length === 0) {
+        alert('Please add at least one citation source first to use the Footnote & Citation Tool.');
+        return;
+      }
+
+      populateToolSourceSelect();
+      const sel = document.getElementById('toolSourceSelect');
+      if (sourceId) sel.value = sourceId;
+      else if (sources.length > 0) sel.value = sources[0].id;
+
+      updateToolResults();
+      document.getElementById('footnoteModal').classList.add('active');
+    }
+
+    function populateToolSourceSelect() {
+      const proj = getActiveProject();
+      const sel = document.getElementById('toolSourceSelect');
+      if (!sel) return;
+      sel.innerHTML = '';
+      (proj.sources || []).forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.id;
+        const auth = s.contributors && s.contributors[0] ? s.contributors[0].lastName + ': ' : '';
+        opt.textContent = `${auth}${s.title || 'Untitled'}`;
+        sel.appendChild(opt);
+      });
+    }
+
+    function updateToolResults() {
+      const proj = getActiveProject();
+      const sourceId = document.getElementById('toolSourceSelect').value;
+      const page = document.getElementById('toolPageInput').value.trim();
+      const src = (proj.sources || []).find(s => s.id === sourceId);
+
+      if (!src) return;
+
+      const fullNote = ChicagoEngine.generateFootnote(src, page);
+      const shortNote = ChicagoEngine.generateShortFootnote(src, page);
+      const inText = ChicagoEngine.generateInTextCitation(src, page);
+
+      document.getElementById('toolFullNoteText').innerHTML = `1. ${fullNote}`;
+      document.getElementById('toolShortNoteText').innerHTML = shortNote;
+      document.getElementById('toolInText').innerHTML = inText;
+    }
+
+    /* ==========================================================
+       EXPORT & SHARING FUNCTIONALITY
+       ========================================================== */
+    function copyCitationText(formattedHtml) {
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = formattedHtml;
+      const plainText = tempDiv.textContent || tempDiv.innerText || '';
+
+      navigator.clipboard.writeText(plainText).then(() => {
+        showToast('Citation copied to clipboard');
+      }).catch(err => {
+        console.error('Clipboard copy failed', err);
+      });
+    }
+
+    function copyAllBibliographyRich() {
+      const proj = getActiveProject();
+      const sources = [...(proj.sources || [])];
+      sources.sort((a, b) => {
+        const aAuth = (a.contributors && a.contributors[0] && a.contributors[0].lastName) || a.title || '';
+        const bAuth = (b.contributors && b.contributors[0] && b.contributors[0].lastName) || b.title || '';
+        return aAuth.localeCompare(bAuth);
+      });
+
+      const headerTitle = (currentStyleMode === 'chicago-ad') ? 'References' : 'Bibliography';
+      let textContent = `${headerTitle}\n\n`;
+
+      sources.forEach(src => {
+        const temp = document.createElement('div');
+        temp.innerHTML = ChicagoEngine.generateBibliography(src, currentStyleMode);
+        textContent += temp.textContent.trim() + '\n\n';
+        if (src.annotation) {
+          textContent += `    ${src.annotation.trim()}\n\n`;
+        }
+      });
+
+      navigator.clipboard.writeText(textContent).then(() => {
+        showToast('Complete Bibliography copied to clipboard');
+      }).catch(err => {
+        console.error('Failed to copy', err);
+      });
+    }
+
+    function downloadWordDoc() {
+      const proj = getActiveProject();
+      const sources = [...(proj.sources || [])];
+      sources.sort((a, b) => {
+        const aAuth = (a.contributors && a.contributors[0] && a.contributors[0].lastName) || a.title || '';
+        const bAuth = (b.contributors && b.contributors[0] && b.contributors[0].lastName) || b.title || '';
+        return aAuth.localeCompare(bAuth);
+      });
+
+      const headerTitle = (currentStyleMode === 'chicago-ad') ? 'References' : 'Bibliography';
+
+      let docHtml = `
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+        <head>
+          <meta charset="utf-8">
+          <title>${escapeHtml(proj.title)} - ${headerTitle}</title>
+          <style>
+            @page {
+              size: 8.5in 11.0in;
+              margin: 1.0in 1.0in 1.0in 1.0in;
+              mso-header-margin: .5in;
+              mso-footer-margin: .5in;
+            }
+            body {
+              font-family: 'Times New Roman', serif;
+              font-size: 12pt;
+              line-height: 2.0; /* Chicago double space */
+              color: #000;
+            }
+            h1.bib-header {
+              text-align: center;
+              font-size: 12pt;
+              font-weight: bold;
+              margin-bottom: 24pt;
+              text-transform: capitalize;
+            }
+            p.bib-entry {
+              margin-top: 0pt;
+              margin-bottom: 12pt;
+              text-indent: -0.5in;
+              margin-left: 0.5in;
+              line-height: 2.0;
+            }
+            p.bib-annotation {
+              margin-top: -6pt;
+              margin-bottom: 12pt;
+              margin-left: 0.5in;
+              text-indent: 0;
+              line-height: 1.5;
+              font-size: 11pt;
+            }
+          </style>
+        </head>
+        <body>
+          <h1 class="bib-header">${headerTitle}</h1>
+      `;
+
+      sources.forEach(src => {
+        const bibText = ChicagoEngine.generateBibliography(src, currentStyleMode);
+        docHtml += `<p class="bib-entry">${bibText}</p>`;
+        if (src.annotation) {
+          docHtml += `<p class="bib-annotation">${escapeHtml(src.annotation)}</p>`;
+        }
+      });
+
+      docHtml += `
+        </body>
+        </html>
+      `;
+
+      const blob = new Blob(['\ufeff' + docHtml], { type: 'application/msword' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${proj.title.toLowerCase().replace(/[^a-z0-9]+/g, '_')}_chicago_bibliography.doc`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('Downloaded Word-compatible bibliography document');
+    }
+
+    function exportJsonBackup() {
+      const proj = getActiveProject();
+      const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(proj, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute('href', dataStr);
+      downloadAnchor.setAttribute('download', `${proj.title.toLowerCase().replace(/[^a-z0-9]+/g, '_')}_backup.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      showToast('Project backup exported as JSON');
+    }
+
+    function importJsonBackup(file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const imported = JSON.parse(e.target.result);
+          if (imported.title && Array.isArray(imported.sources)) {
+            imported.id = 'proj_' + Date.now();
+            appData.projects.push(imported);
+            activeProjectId = imported.id;
+            saveData();
+            renderApp();
+            showToast(`Imported project: ${imported.title}`);
+            document.getElementById('exportModal').classList.remove('active');
+          } else {
+            alert('Invalid NoodleCite project file structure.');
+          }
+        } catch (err) {
+          alert('Error parsing JSON backup file.');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    /* ==========================================================
+       EVENT LISTENERS & BINDINGS
+       ========================================================== */
+    document.addEventListener('DOMContentLoaded', () => {
+      loadData();
+      renderApp();
+
+      // Top Header Buttons
+      document.getElementById('btnNewSourceTop').addEventListener('click', () => openSourceModal());
+      document.getElementById('btnNewSource').addEventListener('click', () => openSourceModal());
+      document.getElementById('btnQuickSample').addEventListener('click', () => {
+        if (confirm('Load sample "The Atlantic World & The American Revolution" project?')) {
+          const exists = appData.projects.find(p => p.id === SAMPLE_PROJECT.id);
+          if (!exists) {
+            appData.projects.push(JSON.parse(JSON.stringify(SAMPLE_PROJECT)));
+          }
+          activeProjectId = SAMPLE_PROJECT.id;
+          saveData();
+          renderApp();
+          showToast('Loaded sample Chicago research project');
+        }
+      });
+
+      document.getElementById('btnFootnoteTool').addEventListener('click', () => openFootnoteModalFor());
+      document.getElementById('btnDoneFootnote').addEventListener('click', () => {
+        document.getElementById('footnoteModal').classList.remove('active');
+      });
+      document.getElementById('btnCloseFootnoteModal').addEventListener('click', () => {
+        document.getElementById('footnoteModal').classList.remove('active');
+      });
+
+      // Project Switcher
+      document.getElementById('projectSelect').addEventListener('change', (e) => {
+        activeProjectId = e.target.value;
+        saveData();
+        renderApp();
+      });
+
+      document.getElementById('btnNewProject').addEventListener('click', () => createNewProject());
+      document.getElementById('btnProjectSettings').addEventListener('click', () => openProjectModal());
+      document.getElementById('btnCancelProject').addEventListener('click', closeProjectModal);
+      document.getElementById('btnCloseProjectModal').addEventListener('click', closeProjectModal);
+      document.getElementById('btnSaveProject').addEventListener('click', saveProjectSettings);
+
+      // Style System Toggle (Notes & Bib vs Author-Date)
+      document.getElementById('btnModeNB').addEventListener('click', () => {
+        currentStyleMode = 'chicago-nb';
+        const p = getActiveProject();
+        p.style = 'chicago-nb';
+        saveData();
+        renderApp();
+        showToast('Switched to Chicago Notes & Bibliography');
+      });
+
+      document.getElementById('btnModeAD').addEventListener('click', () => {
+        currentStyleMode = 'chicago-ad';
+        const p = getActiveProject();
+        p.style = 'chicago-ad';
+        saveData();
+        renderApp();
+        showToast('Switched to Chicago Author-Date System');
+      });
+
+      // Tab Navigation
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+          document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+          btn.classList.add('active');
+          const tabId = btn.getAttribute('data-tab');
+          document.getElementById(tabId).classList.add('active');
+
+          if (tabId === 'tabPaperPreview') renderPaperPreview();
+          if (tabId === 'tabNotecards') renderNotecardsGrid();
+        });
+      });
+
+      // Search & Filters
+      document.getElementById('searchInput').addEventListener('input', renderSourcesList);
+      document.getElementById('filterType').addEventListener('change', renderSourcesList);
+      document.getElementById('sortOrder').addEventListener('change', renderSourcesList);
+      document.getElementById('chkToggleAnnotations').addEventListener('change', renderSourcesList);
+
+      // Source Wizard Modals
+      document.getElementById('btnCloseSourceModal').addEventListener('click', closeSourceModal);
+      document.getElementById('btnCancelSource').addEventListener('click', closeSourceModal);
+      document.getElementById('btnSaveSource').addEventListener('click', saveSource);
+
+      document.querySelectorAll('#sourceTypeGrid .type-select-btn').forEach(btn => {
+        btn.addEventListener('click', () => selectSourceType(btn.getAttribute('data-type')));
+      });
+
+      document.getElementById('btnAddContributor').addEventListener('click', () => {
+        addContributorRow('author', '', '', '', '');
+        updateModalLivePreview();
+      });
+
+      // Quick-fill buttons
+      document.getElementById('btnPrefillBook').addEventListener('click', () => {
+        selectSourceType('book');
+        document.getElementById('contributorsContainer').innerHTML = '';
+        addContributorRow('author', 'Ron', '', 'Chernow', '');
+        document.getElementById('inpTitle').value = 'Alexander Hamilton';
+        document.getElementById('inpPublisher').value = 'Penguin Books';
+        document.getElementById('inpPubPlace').value = 'New York';
+        document.getElementById('inpPubYear').value = '2004';
+        document.getElementById('inpAnnotation').value = 'Comprehensive political biography of Alexander Hamilton.';
+        updateModalLivePreview();
+      });
+
+      document.getElementById('btnPrefillJournal').addEventListener('click', () => {
+        selectSourceType('journal');
+        document.getElementById('contributorsContainer').innerHTML = '';
+        addContributorRow('author', 'Natalie', 'Zemon', 'Davis', '');
+        document.getElementById('inpTitle').value = 'The Rites of Violence: Religious Riot in Sixteenth-Century France';
+        document.getElementById('inpContainerTitle').value = 'Past & Present';
+        document.getElementById('inpIssue').value = '59';
+        document.getElementById('inpPubYear').value = '1973';
+        document.getElementById('inpPageRange').value = '51–91';
+        document.getElementById('inpUrlDoi').value = 'https://doi.org/10.1093/past/59.1.51';
+        document.getElementById('inpAnnotation').value = 'Seminal study of religious riots and crowd dynamics.';
+        updateModalLivePreview();
+      });
+
+      document.getElementById('btnPrefillWeb').addEventListener('click', () => {
+        selectSourceType('website');
+        document.getElementById('contributorsContainer').innerHTML = '';
+        addContributorRow('author', '', '', 'Library of Congress', '');
+        document.getElementById('inpTitle').value = 'The American Revolution: A Selected Resource Guide';
+        document.getElementById('inpContainerTitle').value = 'Library of Congress Digital Collections';
+        document.getElementById('inpPublisher').value = 'Library of Congress';
+        document.getElementById('inpExactDate').value = 'July 4, 2022';
+        document.getElementById('inpUrlDoi').value = 'https://www.loc.gov/rr/program/bib/revwar/';
+        document.getElementById('inpAccessDate').value = 'October 1, 2026';
+        document.getElementById('inpAnnotation').value = 'Archival directory of primary source collections.';
+        updateModalLivePreview();
+      });
+
+      document.getElementById('btnPrefillChapter').addEventListener('click', () => {
+        selectSourceType('chapter');
+        document.getElementById('contributorsContainer').innerHTML = '';
+        addContributorRow('author', 'Edmund', 'S.', 'Morgan', '');
+        document.getElementById('inpTitle').value = 'The Puritan Ethic and the American Revolution';
+        document.getElementById('inpContainerTitle').value = 'Essays on the American Revolution';
+        document.getElementById('inpBookEditor').value = 'Stephen G. Kurtz and James H. Hutson';
+        document.getElementById('inpPublisher').value = 'University of North Carolina Press';
+        document.getElementById('inpPubPlace').value = 'Chapel Hill';
+        document.getElementById('inpPubYear').value = '1973';
+        document.getElementById('inpPageRange').value = '3–43';
+        document.getElementById('inpAnnotation').value = 'Explores religious and moral motivations behind non-importation agreements.';
+        updateModalLivePreview();
+      });
+
+      // Bind modal inputs to live citation preview
+      const inputIds = [
+        'inpTitle', 'inpContainerTitle', 'inpBookEditor', 'inpPublisher', 'inpPubPlace',
+        'inpPubYear', 'inpVolume', 'inpIssue', 'inpExactDate', 'inpPageRange',
+        'inpEdition', 'inpUrlDoi', 'inpAccessDate'
+      ];
+      inputIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', updateModalLivePreview);
+      });
+
+      // Notecard Modals
+      document.getElementById('btnNewNotecard').addEventListener('click', () => openNotecardModal());
+      document.getElementById('btnCloseNotecardModal').addEventListener('click', closeNotecardModal);
+      document.getElementById('btnCancelNotecard').addEventListener('click', closeNotecardModal);
+      document.getElementById('btnSaveNotecard').addEventListener('click', saveNotecard);
+
+      // Footnote Tool Modals
+      document.getElementById('toolSourceSelect').addEventListener('change', updateToolResults);
+      document.getElementById('toolPageInput').addEventListener('input', updateToolResults);
+      document.getElementById('btnCopyFullNote').addEventListener('click', () => {
+        const text = document.getElementById('toolFullNoteText').innerText;
+        navigator.clipboard.writeText(text).then(() => showToast('Full Footnote copied to clipboard'));
+      });
+      document.getElementById('btnCopyShortNote').addEventListener('click', () => {
+        const text = document.getElementById('toolShortNoteText').innerText;
+        navigator.clipboard.writeText(text).then(() => showToast('Short Footnote copied to clipboard'));
+      });
+      document.getElementById('btnCopyInText').addEventListener('click', () => {
+        const text = document.getElementById('toolInText').innerText;
+        navigator.clipboard.writeText(text).then(() => showToast('In-Text citation copied to clipboard'));
+      });
+
+      // Export & Printing
+      document.getElementById('btnExportBib').addEventListener('click', () => {
+        document.getElementById('exportModal').classList.add('active');
+      });
+      document.getElementById('btnCloseExportModal').addEventListener('click', () => {
+        document.getElementById('exportModal').classList.remove('active');
+      });
+      document.getElementById('btnCloseExport').addEventListener('click', () => {
+        document.getElementById('exportModal').classList.remove('active');
+      });
+
+      document.getElementById('btnCopyFormattedBib').addEventListener('click', copyAllBibliographyRich);
+      document.getElementById('btnExpCopyRich').addEventListener('click', () => {
+        copyAllBibliographyRich();
+        document.getElementById('exportModal').classList.remove('active');
+      });
+
+      document.getElementById('btnDownloadDocx').addEventListener('click', downloadWordDoc);
+      document.getElementById('btnExpDownloadDoc').addEventListener('click', () => {
+        downloadWordDoc();
+        document.getElementById('exportModal').classList.remove('active');
+      });
+
+      document.getElementById('btnExpDownloadJSON').addEventListener('click', exportJsonBackup);
+      document.getElementById('inpImportFile').addEventListener('change', (e) => {
+        if (e.target.files.length > 0) importJsonBackup(e.target.files[0]);
+      });
+
+      document.getElementById('btnPrintBib').addEventListener('click', () => {
+        document.querySelector('[data-tab="tabPaperPreview"]').click();
+        setTimeout(() => window.print(), 200);
+      });
+    });
+  </script>
+</body>
+</html>
